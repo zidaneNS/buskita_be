@@ -52,7 +52,15 @@ class ScheduleController extends Controller implements HasMiddleware
      */
     public function update(Request $request, Schedule $schedule)
     {
-        //
+        $validatedFields = $request->validate([
+            "bus_schedule" => "required",
+            "capacity" => "required",
+            "number" => "required"
+        ]);
+
+        $schedule->update($validatedFields);
+
+        return response(["message" => "update success"], 200);
     }
 
     /**
@@ -60,6 +68,8 @@ class ScheduleController extends Controller implements HasMiddleware
      */
     public function destroy(Schedule $schedule)
     {
-        //
+        $schedule->delete();
+
+        return response(null, 204);
     }
 }
