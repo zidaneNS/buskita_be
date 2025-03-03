@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('schedules', function (Blueprint $table) {
             $table->id();
-            $table->date('bus_schedule');
+            $table->datetime('bus_schedule');
             $table->string('number');
             $table->bigInteger('capacity');
             $table->bigInteger('ikut_berangkat');

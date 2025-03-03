@@ -66,4 +66,28 @@ class AuthTest extends TestCase
         $response->assertStatus(200);
         $response->assertJson(["message" => "logout success"]);
     }
+
+    public function test_can_update(): void
+    {
+        $user = User::factory()->create([
+            "nim_nip" => 181221055
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $response = $this->putJson('api/user/' . $user->id, [
+            "name" => "zidane1",
+            "email" => "zidane1@gmail.com",
+            "nim_nip" => $user->nim_nip,
+            "number" => $user->number,
+            "address" => $user->address
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson(["message" => "update success"]);
+        $this->assertDatabaseHas('users', [
+            "name" => "zidane1",
+            "email" => "zidane1@gmail.com"
+        ]);
+    }
 }
