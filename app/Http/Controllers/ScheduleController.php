@@ -6,6 +6,7 @@ use App\Models\Schedule;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Gate;
 
 class ScheduleController extends Controller implements HasMiddleware
 {
@@ -20,7 +21,9 @@ class ScheduleController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        //
+        $schedules = Schedule::all();
+
+        return response($schedules);
     }
 
     /**
@@ -28,14 +31,18 @@ class ScheduleController extends Controller implements HasMiddleware
      */
     public function store(Request $request)
     {
+        if (! Gate::allows('co_access')) {
+            return response(null, 403);
+        }
+        
         $validatedFields = $request->validate([
             "bus_schedule" => "required",
             "capacity" => "required",
             "number" => "required"
         ]);
-
+        
         $schedule = Schedule::factory()->create($validatedFields);
-
+        
         return response($schedule, 201);
     }
 
@@ -44,7 +51,7 @@ class ScheduleController extends Controller implements HasMiddleware
      */
     public function show(Schedule $schedule)
     {
-        //
+        return response($schedule);
     }
 
     /**
@@ -52,6 +59,10 @@ class ScheduleController extends Controller implements HasMiddleware
      */
     public function update(Request $request, Schedule $schedule)
     {
+        if (! Gate::allows('co_access')) {
+            return response(null, 403);
+        }
+        
         $validatedFields = $request->validate([
             "bus_schedule" => "required",
             "capacity" => "required",
@@ -68,6 +79,10 @@ class ScheduleController extends Controller implements HasMiddleware
      */
     public function destroy(Schedule $schedule)
     {
+        if (! Gate::allows('co_access')) {
+            return response(null, 403);
+        }
+
         $schedule->delete();
 
         return response(null, 204);
