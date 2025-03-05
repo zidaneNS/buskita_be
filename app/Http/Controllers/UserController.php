@@ -12,7 +12,9 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
+        $users = User::all();
+
+        return response($users);
     }
 
     /**
@@ -26,9 +28,13 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(User $user)
+    public function show(Request $request, User $user)
     {
-        //
+        if ($request->user()->id !== $user->id && $request->user()->role !== "co") {
+            return response(null, 403);
+        } else {
+            return response($user);
+        }
     }
 
     /**
