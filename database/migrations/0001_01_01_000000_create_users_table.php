@@ -18,9 +18,9 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->string('phone_number');
+            $table->string('phone_number')->unique();
             $table->text('address');
-            $table->bigInteger('credit_score')->max(100);
+            $table->bigInteger('credit_score')->default(100);
             $table->enum('role', ['user', 'co', 'admin']);
             $table->rememberToken();
             $table->timestamps();
