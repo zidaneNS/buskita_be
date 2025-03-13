@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Bus;
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -19,6 +20,7 @@ return new class extends Migration
             $table->bigInteger('col_position');
             $table->bigInteger('backseat_position');
             $table->enum('status', ['available', 'booked']);
+            $table->foreignIdFor(User::class);
             $table->timestamps();
         });
     }

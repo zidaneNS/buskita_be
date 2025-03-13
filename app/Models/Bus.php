@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Bus extends Model
 {
@@ -17,4 +18,14 @@ class Bus extends Model
         'available_col',
         'available_backseat'
     ];
+
+    public function schedules(): HasMany
+    {
+        return $this->hasMany(Schedule::class);
+    }
+
+    public function seats(): HasMany
+    {
+        return $this->hasMany(Seat::class);
+    }
 }
