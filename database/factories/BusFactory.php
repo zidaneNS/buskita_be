@@ -17,7 +17,10 @@ class BusFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'available_row' => 5,
+            'available_col' => 4,
+            'available_backseat' => 0,
+            'capacity' => 20
         ];
     }
 }
