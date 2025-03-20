@@ -150,11 +150,22 @@ class BusManagementTest extends TestCase
 
         $bus = $this->dummy_bus();
 
-        $response = $this->getJson('api/buses/' . $bus->id);
+        $response = $this->get('api/buses/' . $bus->id);
 
         $response->assertStatus(200);
         $response->assertJson([
             "id" => $bus->id
         ]);
+    }
+
+    public function test_user_cannot_access_bus(): void
+    {
+        $this->dummy_user();
+
+        $bus = $this->dummy_bus();
+
+        $response = $this->get('api/buses/' . $bus->id);
+
+        $response->assertStatus(403);
     }
 }
