@@ -16,11 +16,10 @@ return new class extends Migration
         Schema::create('seats', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Bus::class);
-            $table->bigInteger('row_position');
-            $table->bigInteger('col_position');
-            $table->bigInteger('backseat_position');
-            $table->enum('status', ['available', 'booked']);
-            $table->foreignIdFor(User::class);
+            $table->bigInteger('row_position')->nullable();
+            $table->bigInteger('col_position')->nullable();
+            $table->bigInteger('backseat_position')->nullable();
+            $table->foreignIdFor(User::class)->nullable();
             $table->timestamps();
         });
     }

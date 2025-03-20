@@ -13,7 +13,6 @@ class Bus extends Model
 
     protected $fillable = [
         'identity',
-        'capacity',
         'available_row',
         'available_col',
         'available_backseat'

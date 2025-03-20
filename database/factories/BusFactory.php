@@ -19,8 +19,7 @@ class BusFactory extends Factory
         return [
             'available_row' => 5,
             'available_col' => 4,
-            'available_backseat' => 0,
-            'capacity' => 20
+            'available_backseat' => 0
         ];
     }
 }

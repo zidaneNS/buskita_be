@@ -20,8 +20,8 @@ return new class extends Migration
             $table->string('password');
             $table->string('phone_number')->unique();
             $table->text('address');
-            $table->bigInteger('credit_score')->default(100);
-            $table->enum('role', ['user', 'co', 'admin']);
+            $table->bigInteger('credit_score')->default(15);
+            $table->enum('role', ['passenger', 'co', 'co_leader']);
             $table->rememberToken();
             $table->timestamps();
         });

@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Bus;
+use App\Models\Route;
 use App\Models\Schedule;
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
@@ -18,8 +19,9 @@ return new class extends Migration
             $table->id();
             $table->dateTime('bus_schedule');
             $table->foreignIdFor(Bus::class);
-            $table->enum('route', ['sby_gsk', 'gsk_sby']);
-            $table->enum('status', ['pending', 'done']);
+            $table->foreignIdFor(Route::class);
+            $table->boolean('closed')->default(false);
+            $table->boolean('completed')->default(false);
             $table->timestamps();
         });
 

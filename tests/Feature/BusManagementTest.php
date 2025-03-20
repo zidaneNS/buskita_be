@@ -14,11 +14,11 @@ class BusManagementTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
-    public function dummy_admin(): User
+    public function dummy_co_leader(): User
     {
         $user = User::factory()->create([
             "name" => "zidane",
-            "role" => "admin",
+            "role" => "co_leader",
             "nim_nip" => "181221055"
         ]);
 
@@ -26,11 +26,11 @@ class BusManagementTest extends TestCase
         return $user;
     }
 
-    public function dummy_user(): User
+    public function dummy_passenger(): User
     {
         $user = User::factory()->create([
             "name" => "zidane",
-            "role" => "user",
+            "role" => "passenger",
             "nim_nip" => "181221055"
         ]);
 
@@ -57,7 +57,7 @@ class BusManagementTest extends TestCase
 
     public function test_admin_co_can_create_bus(): void
     {
-        $this->dummy_admin();
+        $this->dummy_co_leader();
 
         $response = $this->create_bus();
 
@@ -70,7 +70,7 @@ class BusManagementTest extends TestCase
 
     public function test_bus_identity_must_unique(): void
     {
-        $this->dummy_admin();
+        $this->dummy_co_leader();
 
         $this->dummy_bus();
 
@@ -81,7 +81,7 @@ class BusManagementTest extends TestCase
 
     public function test_admin_co_can_delete_bus(): void
     {
-        $this->dummy_admin();
+        $this->dummy_co_leader();
 
         $bus = $this->dummy_bus();
 
@@ -95,7 +95,7 @@ class BusManagementTest extends TestCase
 
     public function test_admin_co_can_update(): void
     {
-        $this->dummy_admin();
+        $this->dummy_co_leader();
 
         $bus = $this->dummy_bus();
 
@@ -116,7 +116,7 @@ class BusManagementTest extends TestCase
 
     public function test_bus_identity_unique_when_update(): void
     {
-        $this->dummy_admin();
+        $this->dummy_co_leader();
 
         $bus1 = $this->dummy_bus();
         $bus2 = $this->dummy_bus("2");
@@ -133,7 +133,7 @@ class BusManagementTest extends TestCase
 
     public function test_admin_co_can_get_all_buses(): void
     {
-        $this->dummy_admin();
+        $this->dummy_co_leader();
 
         $this->dummy_bus();
         $this->dummy_bus("2");
@@ -146,7 +146,7 @@ class BusManagementTest extends TestCase
 
     public function test_admin_co_can_get_bus_by_id(): void
     {
-        $this->dummy_admin();
+        $this->dummy_co_leader();
 
         $bus = $this->dummy_bus();
 
@@ -160,7 +160,7 @@ class BusManagementTest extends TestCase
 
     public function test_user_cannot_access_bus(): void
     {
-        $this->dummy_user();
+        $this->dummy_passenger();
 
         $bus = $this->dummy_bus();
 

@@ -13,7 +13,7 @@ class AuthTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
     
-    public function dummy_admin(): User
+    public function dummy_co_leader(): User
     {
         $user = User::factory()->create([
             "name" => "zidane",
@@ -34,7 +34,7 @@ class AuthTest extends TestCase
             "email" => "zidane@gmail.com",
             "password" => "password",
             "password_confirmation" => "password",
-            "role" => "admin"
+            "role" => "co_leader"
         ]);
     }
 
@@ -46,7 +46,7 @@ class AuthTest extends TestCase
         $this->assertDatabaseHas('users', [
             "name" => "zidane",
             "nim_nip" => "181221055",
-            "credit_score" => 100
+            "credit_score" => 15
         ]);
     }
 
@@ -65,7 +65,7 @@ class AuthTest extends TestCase
 
     public function test_can_logout(): void
     {
-        $this->dummy_admin();
+        $this->dummy_co_leader();
 
         $response = $this->get('api/logout');
         $response->assertStatus(204);

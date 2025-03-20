@@ -16,7 +16,7 @@ class Seat extends Model
         'row_position',
         'col_position',
         'backseat_position',
-        'status'
+        'user_id'
     ];
 
     public function user(): BelongsTo
