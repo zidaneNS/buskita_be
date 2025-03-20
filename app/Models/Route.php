@@ -13,6 +13,6 @@ class Route extends Model
 
     public function schedules(): HasMany
     {
-        return $this->hasMany(Schedule::class)''
+        return $this->hasMany(Schedule::class);
     }
 }
