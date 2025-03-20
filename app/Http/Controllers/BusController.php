@@ -6,6 +6,7 @@ use App\Models\Bus;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Gate;
 
 class BusController extends Controller implements HasMiddleware
 {
@@ -53,6 +54,7 @@ class BusController extends Controller implements HasMiddleware
      */
     public function show(Bus $bus)
     {
+        // Gate::authorize('admin-co-only');
         return response($bus);
     }
 
