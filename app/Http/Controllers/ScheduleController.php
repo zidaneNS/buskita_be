@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Middleware\AdminCoMiddleware;
 use App\Models\Schedule;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
-class ScheduleController extends Controller //implements HasMiddleware
+class ScheduleController extends Controller implements HasMiddleware
 {
-    // public static function middleware(): array
-    // {
-    //     return [
-    //         new Middleware()
-    //     ];
-    // }
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('co-co_leader', except: ['index', 'show'])
+        ];
+    }
     /**
      * Display a listing of the resource.
      */
@@ -46,7 +47,7 @@ class ScheduleController extends Controller //implements HasMiddleware
      */
     public function show(Schedule $schedule)
     {
-        //
+        return response($schedule);
     }
 
     /**
