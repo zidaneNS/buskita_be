@@ -17,8 +17,7 @@ class Schedule extends Model
         'bus_schedule',
         'bus_id',
         'route_id',
-        'closed',
-        'completed'
+        'closed'
     ];
 
     public function users(): BelongsToMany

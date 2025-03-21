@@ -17,9 +17,8 @@ class BusManagementTest extends TestCase
     public function dummy_co_leader(): User
     {
         $user = User::factory()->create([
-            "name" => "zidane",
-            "role" => "co_leader",
-            "nim_nip" => "181221055"
+            'name' => 'zidane',
+            'nim_nip' => '181221055'
         ]);
 
         Sanctum::actingAs($user);
@@ -29,19 +28,19 @@ class BusManagementTest extends TestCase
     public function dummy_passenger(): User
     {
         $user = User::factory()->create([
-            "name" => "zidane",
-            "role" => "passenger",
-            "nim_nip" => "181221055"
+            'name' => 'zidane',
+            'role' => 'passenger',
+            'nim_nip' => '181221055'
         ]);
 
         Sanctum::actingAs($user);
         return $user;
     }
 
-    public function dummy_bus($identity = "8"): Bus
+    public function dummy_bus($identity = '8'): Bus
     {
         return Bus::factory()->create([
-            "identity" => $identity
+            'identity' => $identity
         ]);
     }
 

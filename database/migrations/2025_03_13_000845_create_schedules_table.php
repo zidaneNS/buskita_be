@@ -21,7 +21,6 @@ return new class extends Migration
             $table->foreignIdFor(Bus::class);
             $table->foreignIdFor(Route::class);
             $table->boolean('closed')->default(false);
-            $table->boolean('completed')->default(false);
             $table->timestamps();
         });
 
