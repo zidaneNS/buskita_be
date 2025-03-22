@@ -172,8 +172,10 @@ class ScheduleManagementTest extends TestCase
 
         $bus = $this->dummy_bus();
 
+        $dt = Carbon::parse(now())->subHour();
+
         $schedule = Schedule::create([
-            'bus_schedule' => '2025-03-21 07:00:00',
+            'bus_schedule' => $dt,
             'bus_id' => $bus->id,
             'route_id' => 1
         ]);

@@ -31,7 +31,6 @@ class Schedule extends Model
     }
     
     public function route(): BelongsTo
-
     {
         return $this->belongsTo(Route::class);
     }

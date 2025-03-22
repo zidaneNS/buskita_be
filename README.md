@@ -1,66 +1,248 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+## Requirement Analysist
+1. User
+   * user can have many schedules.
+   * user only have one seat in every schedules they have.
+   * the data needed for every user is nim / nip, name, email, phone number, and address.
+   * every user have default value of credit score a maximum of 15 points.
+   * user can pick schedule if credit score >= 10 and the schedule not closed.
+   * credit score increase 1 point everyday if credit score < 15.
+   * user have 3 roles (passenger, co, co leader).
+   * user with co or admin role can do CRUD for bus identity and bus schedule. can verify user presents in every schedule. can manipulate pasenger list in every schedule.
+   * passenger role can register for him/her self.
+   * co role cannot register.
+   * co leader role can register for other co or passenger but cannot register for him/her self but hardcoded instead.
+   * co leader role can do CRUD for other co or passenger.
+   * if user have a schedule but not verified until the schedule completed then credit score decrease by 5 points.
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+2. Schedule
+   * schedule only have one bus.
+   * schedule only have one route.
+   * schedule contains date, route, bus, and closed or not.
+   * if schedule date equals to 1 hour from now then schedule automatically deleted.
+   * schedule can closed by co or co leader.
 
-## About Laravel
+3. Route
+   * route can refers to many schedule.
+   * the data needed from route is route_name.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+4. Bus
+   * bus can refers many schedules.
+   * bus can have many seats.
+   * the data needed for the bus is identity, available row seat, available column seat, and available backseat (can null).
+   * bus identity must unique
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+5. Seat
+   * seat only refers atleast to one bus.
+   * seat only refers max to one user.
+   * data needed for seat is row position, column position, and backseat position.
+   * if row and column position is filled then backeat position null or in reverse.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Database Structure
 
-## Learning Laravel
+### User
+ attributes | description
+ -----------|------------
+ id | PRIMARY KEY , INT
+ nim_nip | NOT NULL, UNIQUE, VARCHAR
+ name | NOT NULL, VARCHAR
+ email | NOT NULL, VARCHAR
+ phone_number | NOT NULL, UNIQUE, VARCHAR
+ address | NOT NULL, TEXT
+ credit_score | NOT NULL, INT, DEFAULT = 15, MAX = 15
+ password | NOT NULL, VARCHAR
+ role | ENUM (passenger, co, co_leader)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Schedule
+ attributes | description
+ -----------|------------
+ id | PRIMARY KEY, INT
+ bus_schedule | NOT NULL, DATE
+ bus_id | NOT NULL, FOREIGN KEY -> busses
+ route_id | NOUT NULL, FOREIGN KEY -> routes
+ closed | NOT NULL, BOOLEAN
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Route
+ attributes | description
+ -----------|------------
+ id | PRIMARY KEY, INT
+ route_name | NOT NULL, VARCHAR (sby_gsk, gsk_sby)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Bus
+ attributes | description
+ -----------|------------
+ id | PRIMARY KEY, INT
+ identity | NOT NULL, VARCHAR, UNIQUE
+ available_row | NOT NULL, INT
+ available_col | NOT NULL, INT
+ available_backseat | NOT NULL, DEFAULT = 0
 
-## Laravel Sponsors
+### Seat
+ attributes | description
+ -----------|------------
+ id | PRIMARY KEY, INT
+ bus_id | NOT NULL, FOREIGN KEY -> busses
+ col_position | NOT NULL, DEFAULT = 0
+ row_position | NOT NULL, DEFAULT = 0
+ backseat_position | NOT NULL, DEFAULT = 0
+ user_id | NULLABLE, FOREIGN KEY -> users
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### schedule_user (pivot)
+ attributes | description
+ -----------|------------
+ id | PRIMARY KEY, INT
+ schedule_id | NOT NULL, FOREIGN KEY -> schedules
+ user_id | NOT NULL, FOREIGN KEY -> users
 
-### Premium Partners
+## STEP
+### 1. Authentication
+#### Admin :
+1. register from start with hardcode
+2. can login / logout
+3. can regis user and co
+4. can delete co
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+#### Co :
+1. only register by admin
+2. can login / logout
 
-## Contributing
+#### User :
+1. can register / login / logout
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+#### request http
+* register : POST api/register
+  * request : (name, nim_nip, address, phone_number, email, role, password, password_confirmation)
+* login : POST api/login
+  * request : (nim_nip, password)
+* logout : GET api/logout
+  * request : (-)
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 2. Bus management
+#### Admin :
+1. can create/update/delete bus
 
-## Security Vulnerabilities
+#### Co :
+1. same as admin
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+#### User :
+1. -
 
-## License
+#### request http
+* create : POST api/buses
+  * request : (identity, available_row, available_col, available_backseat)
+* update : PUT api/buses/{bus}
+  * request : (identity, available_row, available_col, available_backseat)
+* delete : DELETE api/buses/{bus}
+  * request : (-)
+* get all bus : GET api/buses/{bus}
+  * request : (-)
+* get bus by id : GET api/buses/{bus}
+  * request : (-)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+#### todo
+- [x] co, co leader can create
+- [x] bus identity unique
+- [x] co, co leader can delete
+- [x] co, co leader can update
+- [x] bus identity unique when update
+- [x] co, co leader can get all bus
+- [x] co, co leader can get bus by id
+- [x] user can't access
+
+---
+
+### 3. Schedule Management
+#### Admin :
+1. can create/update/delete schedule
+
+#### Co :
+2. same as admin
+
+#### User :
+1. -
+
+#### request http
+* create : POST api/schedules
+  * request : (bus_schedule, bus_id, route_id, closed)
+* update : PUT api/schedules/{schedule}
+  * request : (bus_schedule, bus_id, route_id, closed)
+* delete : DELETE api/schedules/{schedule}
+  * request : (-)
+* get all schedules : GET api/schedules
+  * request : (-)
+* get schedules by id : GET api/schedules/{schedule}
+  * request : (-)
+
+#### todo
+- [x] co, co leader can create schedule.
+- [x] co, co leader can update schedule.
+- [x] co, co leader can delete schedule.
+- [x] user can get all schedules.
+- [x] user can get schedules by id.
+- [x] passenger can't access create, update, delete.
+- [x] schedule deleted 1 hour after the date.
+
+---
+
+### 4. Seat Management
+#### Admin :
+1. can choose seat
+2. can see user's seat list
+3. can verify or kick user from it seat
+4. can change seat position when other seat is empty
+
+#### Co :
+1. same as admin
+
+#### User :
+1. same as admin without no. 2 & 3
+
+#### request http
+* choose seat : POST api/seats
+  * request : (schedule_id, bus_id, row_position, col_position, backseat_position)
+* change seat position : PUT api/seats/{seat}
+  * request : (schedule_id, bus_id, row_position, col_position, backseat_position)
+* see user's seat list : POST api/seats/schedule
+  * request : (schedule_id)
+* verify user's seat : PUT api/seats/{seat}
+  * request : (-)
+* kick user from seat : DELETE api/seats/{seat}
+  * request : (-)
+
+#### todo
+- [x] seat created when schedule created.
+- [x] number of seats depends on available row, column, and backseat of bus.
+- [ ] user can pick seat if seat is empty and credit score >= 10.
+- [ ] user cannot pick seat if credit score < 10.
+- [ ] user only can pick one seat in one schedule.
+- [ ] co, co_leader can remove user from their seat.
+- [ ] passenger cannot remove other user from their seat.
+
+---
+
+### 5. Profile Management
+#### Admin :
+1. can see all users
+2. can see all co
+3. can see both user and co each profile
+4. can delete co or user
+5. can update admin profile
+
+#### Co :
+1. can update co profile
+
+#### User :
+1. same as admin
+
+#### request http
+* see all users : GET api/users
+  * request : (-)
+* see all co : GET api/users/co
+  * request : (-)
+* see user / co profile : GET api/users/{user}
+  * request : (-)
+* delete user / co : DELETE api/users/{user}
+  * request : (-)
+* update profile : PUT api/users/{user}
+  * request : (name, email, phone_number, address, role)

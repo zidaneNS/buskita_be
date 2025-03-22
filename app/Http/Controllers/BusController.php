@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Bus;
+use App\Models\Seat;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -41,8 +42,6 @@ class BusController extends Controller implements HasMiddleware
         if (Bus::where('identity', $validatedFields['identity'])->exists()) {
             return response("Bus identity must be unique", 400);
         }
-
-        $validatedFields['capacity'] = $validatedFields['available_row'] * $validatedFields['available_col'] + $validatedFields['available_backseat'];
 
         $bus = Bus::create($validatedFields);
 

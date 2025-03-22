@@ -23,7 +23,7 @@ class RefreshScheduleMiddleware
             $schedule_time = Carbon::parse($schedule->bus_schedule);
             $now = Carbon::parse(now());
 
-            if ($now->diffInHours($schedule_time) >= 1) {
+            if ($now->diffInHours($schedule_time) < -1) {
                 $schedule->delete();
             }
         }

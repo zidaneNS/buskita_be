@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('identity')->unique();
             $table->bigInteger('available_row');
             $table->bigInteger('available_col');
-            $table->bigInteger('available_backseat');
+        $table->bigInteger('available_backseat')->default(0);
             $table->timestamps();
         });
     }
