@@ -32,7 +32,7 @@ class UserFactory extends Factory
             'address' => fake()->address(),
             'phone_number' => fake()->phoneNumber(),
             'credit_score' => 15,
-            'role' => 'co_leader'
+            'role_id' => 1
         ];
     }
 

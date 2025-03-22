@@ -29,7 +29,7 @@ class BusManagementTest extends TestCase
     {
         $user = User::factory()->create([
             'name' => 'zidane',
-            'role' => 'passenger',
+            'role_id' => 3,
             'nim_nip' => '181221055'
         ]);
 

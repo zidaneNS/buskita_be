@@ -19,7 +19,7 @@ class SeatManagementTest extends TestCase
         $user = User::factory()->create([
             'name' => 'zidane1',
             'nim_nip' => '181221056',
-            'role' => 'passenger'
+            'role_id' => 3
         ]);
 
         return $user;
@@ -40,6 +40,19 @@ class SeatManagementTest extends TestCase
         return Bus::factory()->create([
             'identity' => $identity
         ]);
+    }
+
+    public function dummy_schedule_id($bus_id): int
+    {
+        $co_leader = $this->dummy_co_leader();
+
+        $response = $this->actingAs($co_leader)->postJson('api/schedules', [
+            "bus_schedule" => now()->format('Y-m-d H:i:s'),
+            "bus_id" => $bus_id,
+            "route_id" => 1
+        ]);
+
+        return $response['id'];
     }
 
     public function test_seat_created_when_schedule_created(): void
@@ -81,23 +94,15 @@ class SeatManagementTest extends TestCase
 
     public function test_user_can_pick_seat_if_empty_and_credit_score_greater_than_10(): void
     {
-        $co_leader =$this->dummy_co_leader();
-
         $bus = $this->dummy_bus();
 
-        $schedule_response = $this->actingAs($co_leader)->postJson('api/schedules', [
-            "bus_schedule" => now()->format('Y-m-d H:i:s'),
-            "bus_id" => $bus->id,
-            "route_id" => 1
-        ]);
-
-        $this->actingAs($co_leader)->get('api/logout');
+        $schedule_id = $this->dummy_schedule_id($bus->id);
 
         $passenger = $this->dummy_passenger();
 
         $response = $this->actingAs($passenger)->postJson('api/seats', [
             'bus_id' => $bus->id,
-            'schedule_id' => $schedule_response['id'],
+            'schedule_id' => $schedule_id,
             'row_position' => $bus->available_row,
             'col_position' => $bus->available_col,
             'backseat_position' => 0
@@ -106,7 +111,7 @@ class SeatManagementTest extends TestCase
         $response->assertStatus(200);
         $this
             ->assertDatabaseHas('schedule_user', [
-                'schedule_id' => $schedule_response['id'],
+                'schedule_id' => $schedule_id,
                 'user_id' => $passenger->id
             ])
             ->assertDatabaseHas('seats', [
@@ -117,26 +122,20 @@ class SeatManagementTest extends TestCase
 
     public function test_user_cannot_pick_seat_if_credit_score_less_than_10(): void
     {
-        $co_leader = $this->dummy_co_leader();
-
         $bus = $this->dummy_bus();
 
-        $schedule_response = $this->actingAs($co_leader)->postJson('api/schedules', [
-            "bus_schedule" => now()->format('Y-m-d H:i:s'),
-            "bus_id" => $bus->id,
-            "route_id" => 1
-        ]);
+        $schedule_id = $this->dummy_schedule_id($bus->id);
 
         $passenger = User::factory()->create([
             'name' => 'test',
             'nim_nip' => '123',
-            'role' => 'passenger',
+            'role_id' => 3,
             'credit_score' => 9
         ]);
 
         $response = $this->actingAs($passenger)->postJson('api/seats', [
             'bus_id' => $bus->id,
-            'schedule_id' => $schedule_response['id'],
+            'schedule_id' => $schedule_id,
             'row_position' => $bus->available_row,
             'col_position' => $bus->available_col,
             'backseat_position' => 0
@@ -147,21 +146,20 @@ class SeatManagementTest extends TestCase
 
     public function test_user_cannot_pick_seat_if_seat_occupied(): void
     {
-        $co_leader = $this->dummy_co_leader();
-
         $bus = $this->dummy_bus();
 
-        $schedule_response = $this->actingAs($co_leader)->postJson('api/schedules', [
-            "bus_schedule" => now()->format('Y-m-d H:i:s'),
-            "bus_id" => $bus->id,
-            "route_id" => 1
-        ]);
+        $schedule_id = $this->dummy_schedule_id($bus->id);
 
         $passenger = $this->dummy_passenger();
+        $passenger2 = User::factory()->create([
+            'name' => 'test',
+            'nim_nip' => '123',
+            'role_id' => 3
+        ]);
 
-        $this->actingAs($co_leader)->postJson('api/seats', [
+        $this->actingAs($passenger2)->postJson('api/seats', [
             'bus_id' => $bus->id,
-            'schedule_id' => $schedule_response['id'],
+            'schedule_id' => $schedule_id,
             'row_position' => $bus->available_row,
             'col_position' => $bus->available_col,
             'backseat_position' => 0
@@ -169,7 +167,7 @@ class SeatManagementTest extends TestCase
 
         $response = $this->actingAs($passenger)->postJson('api/seats', [
             'bus_id' => $bus->id,
-            'schedule_id' => $schedule_response['id'],
+            'schedule_id' => $schedule_id,
             'row_position' => $bus->available_row,
             'col_position' => $bus->available_col,
             'backseat_position' => 0
@@ -180,22 +178,21 @@ class SeatManagementTest extends TestCase
 
     public function test_user_can_see_seat_list(): void
     {
-        $co_leader = $this->dummy_co_leader();
-
         $bus = $this->dummy_bus();
 
-        $schedule_response = $this->actingAs($co_leader)->postJson('api/schedules', [
-            "bus_schedule" => now()->format('Y-m-d H:i:s'),
-            "bus_id" => $bus->id,
-            "route_id" => 1
-        ]);
+        $schedule_id = $this->dummy_schedule_id($bus->id);
 
         $passenger = $this->dummy_passenger();
 
         $response = $this->actingAs($passenger)->postJson('api/seats/schedule', [
-            'schedule_id' => $schedule_response['id']
+            'schedule_id' => $schedule_id
         ]);
 
         $response->assertJsonCount($bus->available_row * $bus->available_col + $bus->available_backseat);
     }
+
+    // public function test_user_only_can_pick_one_seat_in_one_schedule(): void
+    // {
+    //     $bus = $this->dummy_bus();
+    // }
 }

@@ -32,7 +32,7 @@ class ScheduleManagementTest extends TestCase
         $user = User::factory()->create([
             'name' => 'zidane',
             'nim_nip' => '181221055',
-            'role' => 'passenger'
+            'role_id' => 3
         ]);
 
         Sanctum::actingAs($user);

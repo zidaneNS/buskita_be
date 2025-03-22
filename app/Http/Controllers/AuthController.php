@@ -34,7 +34,7 @@ class AuthController extends Controller
             "password" => "required|confirmed",
             "address" => "required",
             "phone_number" => "required|unique:users",
-            "role" => "required",
+            "role_id" => "required",
             "nim_nip" => "required"
         ]);
 

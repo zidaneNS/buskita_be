@@ -37,6 +37,10 @@
    * data needed for seat is row position, column position, and backseat position.
    * if row and column position is filled then backeat position null or in reverse.
 
+6. Role
+   * can refers to many users
+   * data needed for role is role name.
+
 ## Database Structure
 
 ### User
@@ -50,7 +54,13 @@
  address | NOT NULL, TEXT
  credit_score | NOT NULL, INT, DEFAULT = 15, MAX = 15
  password | NOT NULL, VARCHAR
- role | ENUM (passenger, co, co_leader)
+ role | NOT NULL, FOREIGN KEY -> roles
+
+### Role
+ attributes | description
+ -----------|------------
+ id | PRIMARY KEY, INT
+ role_name | NOT NULL, ENUM (passenger, co, co_leader)
 
 ### Schedule
  attributes | description
@@ -65,7 +75,7 @@
  attributes | description
  -----------|------------
  id | PRIMARY KEY, INT
- route_name | NOT NULL, VARCHAR (sby_gsk, gsk_sby)
+ route_name | NOT NULL, ENUM (sby_gsk, gsk_sby)
 
 ### Bus
  attributes | description
@@ -80,7 +90,7 @@
  attributes | description
  -----------|------------
  id | PRIMARY KEY, INT
- bus_id | NOT NULL, FOREIGN KEY -> busses
+ bus_id | NOT NULL, FOREIGN KEY -> buses
  col_position | NOT NULL, DEFAULT = 0
  row_position | NOT NULL, DEFAULT = 0
  backseat_position | NOT NULL, DEFAULT = 0

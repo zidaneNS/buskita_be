@@ -34,7 +34,7 @@ class AuthTest extends TestCase
             "email" => "zidane@gmail.com",
             "password" => "password",
             "password_confirmation" => "password",
-            "role" => "co_leader"
+            "role_id" => 1
         ]);
     }
 
