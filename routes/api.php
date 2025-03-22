@@ -16,9 +16,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('/buses', BusController::class)->middleware('co-co_leader');
         Route::apiResource('/schedules', ScheduleController::class);
         Route::apiResource('/seats', SeatController::class);
-        
+        Route::post('/seats/schedule', [SeatController::class, 'index']);
+
         Route::post('/register', [AuthController::class, 'register'])->withoutMiddleware('auth:sanctum');
         Route::post('/login', [AuthController::class, 'login'])->name('login')->withoutMiddleware('auth:sanctum');
         Route::get('/logout', [AuthController::class, 'logout']);
-
 });

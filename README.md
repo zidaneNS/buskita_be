@@ -212,11 +212,13 @@
 
 #### todo
 - [x] seat created when schedule created.
+- [x] user can see seat list.
 - [x] number of seats depends on available row, column, and backseat of bus.
-- [ ] user can pick seat if seat is empty and credit score >= 10.
-- [ ] user cannot pick seat if credit score < 10.
+- [x] user can pick seat if seat is empty and credit score >= 10.
+- [x] user cannot pick seat if credit score < 10.
 - [ ] user only can pick one seat in one schedule.
 - [ ] co, co_leader can remove user from their seat.
+- [ ] user can change their seat position.
 - [ ] passenger cannot remove other user from their seat.
 
 ---

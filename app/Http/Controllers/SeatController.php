@@ -11,9 +11,17 @@ class SeatController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $validatedFields = $request->validate([
+            'schedule_id' => 'required'
+        ]);
+
+        $schedule = Schedule::find($validatedFields['schedule_id']);
+
+        $seats = Seat::where('bus_id', $schedule->bus_id)->get();
+
+        return response($seats);
     }
 
     /**
@@ -29,13 +37,23 @@ class SeatController extends Controller
             'schedule_id' => 'required'
         ]);
 
+        if ($request->user()->credit_score < 10 || Seat::where('bus_id', $validatedFields['bus_id'])
+        ->where('row_position', $validatedFields['row_position'])
+        ->where('col_position', $validatedFields['col_position'])
+        ->where('backseat_position', $validatedFields['backseat_position'])
+        ->pluck('user_id')[0] !== null) {
+            return response(["message" => "seat already taken or credit score less than 10"], 400);
+        }
+        
         $request->user()->schedules()->attach($validatedFields['schedule_id']);
-
-        $seat = Seat::where('bus_id', $validatedFields['bus_id'])->where('row_position', $validatedFields['row_position'])->where('col_position', $validatedFields['col_position'])->where('backseat_position', $validatedFields['backseat_position'])->update([
+        
+        $seat = Seat::where('bus_id', $validatedFields['bus_id'])
+            ->where('row_position', $validatedFields['row_position'])
+            ->where('col_position', $validatedFields['col_position'])
+            ->where('backseat_position', $validatedFields['backseat_position'])
+            ->update([
             'user_id' => $request->user()->id
         ]);
-
-        // dd($seat);
 
         return response($seat);
     }
