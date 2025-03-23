@@ -27,5 +27,11 @@ class AppServiceProvider extends ServiceProvider
                 ? Response::deny()
                 : Response::allow();
         });
+
+        Gate::define('co_leader-only', function (User $user) {
+            return $user->role->id === 1
+                ? Response::allow()
+                : Response::deny();
+        });
     }
 }

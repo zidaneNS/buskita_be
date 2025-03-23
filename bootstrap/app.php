@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\AdminCoMiddleware;
+use App\Http\Middleware\CoLeaderOnly;
 use App\Http\Middleware\RefreshScheduleMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -15,7 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'co-co_leader' => AdminCoMiddleware::class
+            'co-co_leader' => AdminCoMiddleware::class,
+            'co_leader' => CoLeaderOnly::class
         ])->append([
             RefreshScheduleMiddleware::class
         ]);

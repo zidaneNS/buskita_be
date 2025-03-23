@@ -226,8 +226,8 @@
 - [x] seat created when schedule created.
 - [x] user can see seat list.
 - [x] number of seats depends on available row, column, and backseat of bus.
-- [x] user can pick seat if seat is empty and credit score >= 10.
-- [x] user cannot pick seat if credit score < 10.
+- [x] user can pick seat if seat is empty and credit score >= 10 and schedule not closed.
+- [x] user cannot pick seat if credit score < 10 or schedule closed or seat not empty.
 - [x] user only can pick one seat in one schedule.
 - [x] co, co_leader can remove user from their seat.
 - [x] user can cancel their seat.
@@ -257,9 +257,23 @@
   * request : (-)
 * see all co : GET api/users/co
   * request : (-)
+* see all passengers : GET api/users/passenger
+  * request : (-)
 * see user / co profile : GET api/users/{user}
   * request : (-)
 * delete user / co : DELETE api/users/{user}
   * request : (-)
 * update profile : PUT api/users/{user}
   * request : (name, email, phone_number, address, role)
+
+#### todo todo
+- [x] co_leader can see all users.
+- [x] co only can see all passengers.
+- [x] passenger cannot see all users, co, and other passengers.
+- [x] co, co_leader can see user's profile.
+- [x] passenger cannot see other passenger's profile
+- [ ] user can update their profile.
+- [ ] other user cannot update other user's profile.
+- [ ] co_leader can delete other users.
+- [ ] user credit score decrease 5 points if user have unverified seat and the schedule is complete.
+- [ ] user credit score increase 1 points everyday if credit score < 15.

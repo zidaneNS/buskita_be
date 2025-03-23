@@ -96,7 +96,7 @@ class SeatManagementTest extends TestCase
         ]);
     }
 
-    public function test_user_can_pick_seat_if_empty_and_credit_score_greater_than_10(): void
+    public function test_user_can_pick_seat_if_empty_and_credit_score_greater_than_10_and_schedule_not_closed(): void
     {
         $bus = $this->dummy_bus();
 
@@ -168,6 +168,39 @@ class SeatManagementTest extends TestCase
             'row_position' => $bus->available_row,
             'col_position' => $bus->available_col,
             'backseat_position' => 0
+        ]);
+
+        $response = $this->actingAs($passenger)->postJson('api/seats', [
+            'bus_id' => $bus->id,
+            'schedule_id' => $schedule_id,
+            'row_position' => $bus->available_row,
+            'col_position' => $bus->available_col,
+            'backseat_position' => 0
+        ]);
+
+        $response->assertStatus(400);
+    }
+
+    public function test_user_cannot_pick_seat_if_schedule_closed(): void
+    {
+        $bus = $this->dummy_bus();
+
+        $schedule_id = $this->dummy_schedule_id($bus->id);
+
+        $passenger = $this->dummy_passenger();
+
+        $co_leader = User::factory()->create([
+            'name' => 'test',
+            'nim_nip' => 'cole'
+        ]);
+
+        $schedule = Schedule::find($schedule_id);
+
+        $this->actingAs($co_leader)->putJson('api/schedules/' . $schedule_id, [
+            "bus_schedule" => $schedule->bus_schedule,
+            "bus_id" => $bus->id,
+            "route_id" => $schedule->route_id,
+            "closed" => true
         ]);
 
         $response = $this->actingAs($passenger)->postJson('api/seats', [

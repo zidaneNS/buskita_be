@@ -55,7 +55,8 @@ class SeatController extends Controller implements HasMiddleware
             ->where('backseat_position', $validatedFields['backseat_position'])
             ->where('schedule_id', $validatedFields['schedule_id'])
             ->pluck('user_id')[0] !== null ||
-            Schedule::whereRelation('users', 'users.id', $request->user()->id)->exists()) {
+            Schedule::whereRelation('users', 'users.id', $request->user()->id)->exists() ||
+            Schedule::find($validatedFields['schedule_id'])->closed) {
             return response(["message" => "seat already taken or credit score less than 10"], 400);
         }
         
