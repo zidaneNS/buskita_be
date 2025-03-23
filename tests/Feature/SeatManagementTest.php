@@ -76,19 +76,23 @@ class SeatManagementTest extends TestCase
         $this->assertDatabaseHas('seats', [
             'bus_id' => $bus->id,
             'row_position' => $bus->available_row,
-            'col_position' => $bus->available_col
+            'col_position' => $bus->available_col,
+            'schedule_id' => $response['id']
         ]);
         $this->assertDatabaseHas('seats', [
             'bus_id' => $bus->id,
-            'backseat_position' => $bus->available_backseat
+            'backseat_position' => $bus->available_backseat,
+            'schedule_id' => $response['id']
         ]);
         $this->assertDatabaseMissing('seats', [
             'bus_id' => $bus->id,
-            'row_position' => $bus->available_row + 1
+            'row_position' => $bus->available_row + 1,
+            'schedule_id' => $response['id']
         ]);
         $this->assertDatabaseMissing('seats', [
             'bus_id' => $bus->id,
-            'backseat_position' => $bus->available_backseat + 1
+            'backseat_position' => $bus->available_backseat + 1,
+            'schedule_id' => $response['id']
         ]);
     }
 
@@ -116,7 +120,8 @@ class SeatManagementTest extends TestCase
             ])
             ->assertDatabaseHas('seats', [
                 'bus_id' => $bus->id,
-                'user_id' => $passenger->id
+                'user_id' => $passenger->id,
+                'schedule_id' => $schedule_id
             ]);
     }
 
@@ -191,8 +196,214 @@ class SeatManagementTest extends TestCase
         $response->assertJsonCount($bus->available_row * $bus->available_col + $bus->available_backseat);
     }
 
-    // public function test_user_only_can_pick_one_seat_in_one_schedule(): void
-    // {
-    //     $bus = $this->dummy_bus();
-    // }
+    public function test_user_only_can_pick_one_seat_in_one_schedule(): void
+    {
+        $bus = $this->dummy_bus();
+
+        $schedule_id = $this->dummy_schedule_id($bus->id);
+
+        $passenger = $this->dummy_passenger();
+
+        $this->actingAs($passenger)->postJson('api/seats', [
+            'bus_id' => $bus->id,
+            'schedule_id' => $schedule_id,
+            'row_position' => $bus->available_row,
+            'col_position' => $bus->available_col,
+            'backseat_position' => 0
+        ]);
+
+        $response = $this->actingAs($passenger)->postJson('api/seats', [
+            'bus_id' => $bus->id,
+            'schedule_id' => $schedule_id,
+            'row_position' => $bus->available_row - 1,
+            'col_position' => $bus->available_col,
+            'backseat_position' => 0
+        ]);
+
+        $response->assertStatus(400);
+    }
+
+    public function test_co_co_leader_can_remove_user_from_their_seat(): void
+    {
+        $bus = $this->dummy_bus();
+
+        $schedule_id = $this->dummy_schedule_id($bus->id);
+
+        $co_leader = User::factory()->create([
+            'name' => 'test',
+            'nim_nip' => '123'
+        ]);
+
+        $passenger = $this->dummy_passenger();
+
+        $passenger_seat = $this->actingAs($passenger)->postJson('api/seats', [
+            'bus_id' => $bus->id,
+            'schedule_id' => $schedule_id,
+            'row_position' => $bus->available_row,
+            'col_position' => $bus->available_col,
+            'backseat_position' => 0
+        ]);
+
+        $response = $this->actingAs($co_leader)->deleteJson('api/seats/' . $passenger_seat['id']);
+
+        $response->assertStatus(204);
+        $this
+            ->assertDatabaseMissing('schedule_user', [
+                'schedule_id' => $schedule_id,
+                'user_id' => $passenger->id
+            ])
+            ->assertDatabaseHas('seats', [
+                'id' => $passenger_seat['id'],
+                'user_id' => null
+            ]);
+    }
+
+    public function test_user_can_cancel_their_seat(): void
+    {
+        $bus = $this->dummy_bus();
+
+        $schedule_id = $this->dummy_schedule_id($bus->id);
+
+        $passenger = $this->dummy_passenger();
+
+        $passenger_seat = $this->actingAs($passenger)->postJson('api/seats', [
+            'bus_id' => $bus->id,
+            'schedule_id' => $schedule_id,
+            'row_position' => $bus->available_row,
+            'col_position' => $bus->available_col,
+            'backseat_position' => 0
+        ]);
+
+        $response = $this->actingAs($passenger)->deleteJson('api/seats/' . $passenger_seat['id']);
+
+        $response->assertStatus(204);
+
+        $this
+            ->assertDatabaseMissing('schedule_user', [
+                'schedule_id' => $schedule_id,
+                'user_id' => $passenger->id
+            ])
+            ->assertDatabaseHas('seats', [
+                'id' => $passenger_seat['id'],
+                'user_id' => null
+            ]);
+    }
+
+    public function test_passenger_cannot_cancel_other_passengers_seat(): void
+    {
+        $bus = $this->dummy_bus();
+
+        $schedule_id = $this->dummy_schedule_id($bus->id);
+
+        $passenger = $this->dummy_passenger();
+        $passenger2 = User::factory()->create([
+            'name' => 'test',
+            'nim_nip' => '123',
+            'role_id' => 3
+        ]);
+
+        $passenger_seat = $this->actingAs($passenger)->postJson('api/seats', [
+            'bus_id' => $bus->id,
+            'schedule_id' => $schedule_id,
+            'row_position' => $bus->available_row,
+            'col_position' => $bus->available_col,
+            'backseat_position' => 0
+        ]);
+
+        $response = $this->actingAs($passenger2)->delete('api/seats/' . $passenger_seat['id']);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_user_can_change_their_seat_position(): void
+    {
+        $bus = $this->dummy_bus();
+
+        $schedule_id = $this->dummy_schedule_id($bus->id);
+
+        $passenger = $this->dummy_passenger();
+
+        $passenger_seat = $this->actingAs($passenger)->postJson('api/seats', [
+            'bus_id' => $bus->id,
+            'schedule_id' => $schedule_id,
+            'row_position' => $bus->available_row,
+            'col_position' => $bus->available_col,
+            'backseat_position' => 0
+        ]);
+
+        $response = $this->actingAs($passenger)->putJson('api/seats/' . $passenger_seat['id'], [
+            'schedule_id' => $schedule_id,
+            'row_position' => $bus->available_row - 3,
+            'col_position' => $bus->available_col,
+            'backseat_position' => 0
+        ]);
+
+        $response->assertStatus(200);
+        $this
+            ->assertDatabaseHas('seats', [
+                'id' => $passenger_seat['id'],
+                'user_id' => null
+            ])
+            ->assertDatabaseHas('seats', [
+                'schedule_id' => $schedule_id,
+                'row_position' => $bus->available_row - 3,
+                'col_position' => $bus->available_col,
+                'backseat_position' => 0,
+                'user_id' => $passenger->id
+            ]);
+    }
+
+    public function test_co_co_leader_can_verify_user(): void
+    {
+        $bus = $this->dummy_bus();
+
+        $schedule_id = $this->dummy_schedule_id($bus->id);
+
+        $passenger = $this->dummy_passenger();
+        $co_leader = User::factory()->create([
+            'name' => 'test',
+            'nim_nip' => '123'
+        ]);
+
+        $passenger_seat = $this->actingAs($passenger)->postJson('api/seats', [
+            'bus_id' => $bus->id,
+            'schedule_id' => $schedule_id,
+            'row_position' => $bus->available_row,
+            'col_position' => $bus->available_col,
+            'backseat_position' => 0
+        ]);
+
+        $response = $this->actingAs($co_leader)->get('api/seats/' . $passenger_seat['id'] . '/verify');
+
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('seats', [
+            'id' => $passenger_seat['id'],
+            'verified' => true
+        ]);
+    }
+
+    public function test_passenger_cannot_verify_another_passenger(): void
+    {
+        $bus = $this->dummy_bus();
+
+        $schedule_id = $this->dummy_schedule_id($bus->id);
+
+        $passenger = $this->dummy_passenger();
+        $passenger2 = User::factory()->create([
+            'name' => 'test',
+            'nim_nip' => '123',
+            'role_id' => 3
+        ]);
+
+        $passenger_seat = $this->actingAs($passenger)->postJson('api/seats', [
+            'bus_id' => $bus->id,
+            'schedule_id' => $schedule_id,
+            'row_position' => $bus->available_row,
+            'col_position' => $bus->available_col,
+            'backseat_position' => 0
+        ]);
+
+        $response = $this->actingAs($passenger2)->get('api/seats/' . $passenger_seat['id'] . '/verify');
+        $response->assertStatus(403);
+    }
 }

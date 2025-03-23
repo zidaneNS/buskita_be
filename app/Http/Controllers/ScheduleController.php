@@ -52,7 +52,8 @@ class ScheduleController extends Controller implements HasMiddleware
                 Seat::create([
                     'bus_id' => $bus->id,
                     'col_position' => $j,
-                    'row_position' => $i
+                    'row_position' => $i,
+                    'schedule_id' => $schedule->id
                 ]);
             }
         }
@@ -60,7 +61,8 @@ class ScheduleController extends Controller implements HasMiddleware
         for ($k = 1; $k <= $backseat; $k++) {
             Seat::create([
                 'bus_id' => $bus->id,
-                'backseat_position' => $k
+                'backseat_position' => $k,
+                'schedule_id' => $schedule->id
             ]);
         }
 

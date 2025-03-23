@@ -16,7 +16,9 @@ class Seat extends Model
         'row_position',
         'col_position',
         'backseat_position',
-        'user_id'
+        'user_id',
+        'schedule_id',
+        'verified'
     ];
 
     public function user(): BelongsTo
@@ -27,5 +29,10 @@ class Seat extends Model
     public function bus(): BelongsTo
     {
         return $this->belongsTo(Bus::class);
+    }
+
+    public function schedule(): BelongsTo
+    {
+        return $this->belongsTo(Schedule::class);
     }
 }

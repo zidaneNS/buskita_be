@@ -95,6 +95,8 @@
  row_position | NOT NULL, DEFAULT = 0
  backseat_position | NOT NULL, DEFAULT = 0
  user_id | NULLABLE, FOREIGN KEY -> users
+ schedule_id | NOT NULL, FOREIGN KEY -> schedules
+ verified | NOT NULL, BOOLEAN, DEFAULT = false
 
 ### schedule_user (pivot)
  attributes | description
@@ -212,13 +214,13 @@
 * choose seat : POST api/seats
   * request : (schedule_id, bus_id, row_position, col_position, backseat_position)
 * change seat position : PUT api/seats/{seat}
-  * request : (schedule_id, bus_id, row_position, col_position, backseat_position)
+  * request : (schedule_id, row_position, col_position, backseat_position)
 * see user's seat list : POST api/seats/schedule
   * request : (schedule_id)
-* verify user's seat : PUT api/seats/{seat}
+* verify user's seat : PUT api/seats/{seat}/verify
   * request : (-)
 * kick user from seat : DELETE api/seats/{seat}
-  * request : (-)
+  * request : (schedule_id)
 
 #### todo
 - [x] seat created when schedule created.
@@ -226,10 +228,13 @@
 - [x] number of seats depends on available row, column, and backseat of bus.
 - [x] user can pick seat if seat is empty and credit score >= 10.
 - [x] user cannot pick seat if credit score < 10.
-- [ ] user only can pick one seat in one schedule.
-- [ ] co, co_leader can remove user from their seat.
-- [ ] user can change their seat position.
-- [ ] passenger cannot remove other user from their seat.
+- [x] user only can pick one seat in one schedule.
+- [x] co, co_leader can remove user from their seat.
+- [x] user can cancel their seat.
+- [x] passenger cannot cancel other passenger's seat
+- [x] user can change their seat position.
+- [x] co, co_leader can verify user
+- [x] passenger cannot verify another passenger
 
 ---
 

@@ -17,6 +17,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('/schedules', ScheduleController::class);
         Route::apiResource('/seats', SeatController::class);
         Route::post('/seats/schedule', [SeatController::class, 'index']);
+        Route::get('/seats/{seat}/verify', [SeatController::class, 'verify']);
 
         Route::post('/register', [AuthController::class, 'register'])->withoutMiddleware('auth:sanctum');
         Route::post('/login', [AuthController::class, 'login'])->name('login')->withoutMiddleware('auth:sanctum');

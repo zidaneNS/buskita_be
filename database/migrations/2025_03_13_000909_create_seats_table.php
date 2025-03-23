@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Bus;
+use App\Models\Schedule;
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -20,6 +21,8 @@ return new class extends Migration
             $table->bigInteger('col_position')->default(0);
             $table->bigInteger('backseat_position')->default(0);
             $table->foreignIdFor(User::class)->nullable();
+            $table->foreignIdFor(Schedule::class);
+            $table->boolean('verified')->default(false);
             $table->timestamps();
         });
     }
