@@ -6,12 +6,12 @@
    * every user have default value of credit score a maximum of 15 points.
    * user can pick schedule if credit score >= 10 and the schedule not closed and seat empty.
    * credit score increase 1 point everyday if credit score < 15.
-   * user have 3 roles (passenger, co, co leader).
-   * user with co or admin role can do CRUD for bus identity and bus schedule. can verify user presents in every schedule. can manipulate pasenger list in every schedule.
+   * user have 1 role from (passenger, co, co leader).
+   * user with co or co_leader role can do CRUD for bus identity and bus schedule. can verify user presents in every schedule. can manipulate pasenger list in every schedule.
    * passenger role can register for him/her self.
    * co role cannot register.
-   * co leader role can register for other co or passenger but cannot register for him/her self but hardcoded instead.
-   * co leader role can do CRUD for other co or passenger.
+   * co_leader role can register for other co or passenger but cannot register for him/her self but hardcoded instead.
+   * co_leader role can do CRUD for other co or passenger.
    * if user have a schedule but not verified until the schedule completed then credit score decrease by 5 points.
 
 2. Schedule
