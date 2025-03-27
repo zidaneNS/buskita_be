@@ -18,7 +18,7 @@
    * schedule only have one bus.
    * schedule only have one route.
    * schedule contains date, route, bus, and closed or not.
-   * if schedule date equals to 1 hour from now then schedule automatically deleted.
+   * if schedule date equals to 1 hour before now then schedule automatically deleted.
    * schedule can closed by co or co leader.
 
 3. Route
