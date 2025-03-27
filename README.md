@@ -4,7 +4,7 @@
    * user only have one seat in every schedules they have.
    * the data needed for every user is nim / nip, name, email, phone number, and address.
    * every user have default value of credit score a maximum of 15 points.
-   * user can pick schedule if credit score >= 10 and the schedule not closed.
+   * user can pick schedule if credit score >= 10 and the schedule not closed and seat empty.
    * credit score increase 1 point everyday if credit score < 15.
    * user have 3 roles (passenger, co, co leader).
    * user with co or admin role can do CRUD for bus identity and bus schedule. can verify user presents in every schedule. can manipulate pasenger list in every schedule.
