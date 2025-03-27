@@ -34,6 +34,7 @@
 
 5. Seat
    * seat only refers atleast to one bus.
+   * seat only refer one schedule
    * seat only refers max to one user.
    * data needed for seat is row position, column position, and backseat position.
    * if row and column position is filled then backeat position null or in reverse.
