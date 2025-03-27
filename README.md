@@ -20,6 +20,7 @@
    * schedule contains date, route, bus, and closed or not.
    * if schedule date equals to 1 hour before now then schedule automatically deleted.
    * schedule can closed by co or co leader.
+   * scheduke can have many seats
 
 3. Route
    * route can refers to many schedule.
