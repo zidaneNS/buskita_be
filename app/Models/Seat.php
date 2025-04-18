@@ -13,9 +13,6 @@ class Seat extends Model
 
     protected $fillable = [
         'bus_id',
-        'row_position',
-        'col_position',
-        'backseat_position',
         'user_id',
         'schedule_id',
         'verified'

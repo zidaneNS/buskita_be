@@ -2,7 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\Bus;
+use App\Models\Schedule;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -58,6 +61,26 @@ class ProfileManagementTest extends TestCase
         }
     }
 
+    public function dummy_bus($identity = '8'): Bus
+    {
+        return Bus::factory()->create([
+            'identity' => $identity
+        ]);
+    }
+
+    public function dummy_schedule_id($bus_id, $time): int
+    {
+        $co_leader = $this->dummy_co_leader();
+
+        $response = $this->actingAs($co_leader)->postJson('api/schedules', [
+            "time" => $time,
+            "bus_id" => $bus_id,
+            "route_id" => 1
+        ]);
+
+        return $response['id'];
+    }
+
     public function test_co_leader_can_see_all_users(): void
     {
         $co_leader = $this->dummy_co_leader();
@@ -69,7 +92,15 @@ class ProfileManagementTest extends TestCase
 
         $response
             ->assertStatus(200)
-            ->assertJsonCount(10);
+            ->assertJsonCount(11)
+            ->assertJsonStructure([
+                '*' => [
+                    'id',
+                    'name',
+                    'nim_nip',
+                    'email'
+                ]
+            ]);
     }
 
     public function test_co_can_see_all_passengers(): void
@@ -78,11 +109,19 @@ class ProfileManagementTest extends TestCase
 
         $this->create_passenger(10);
 
-        $response = $this->actingAs($co)->get('api/passenger');
+        $response = $this->actingAs($co)->get('api/passengers');
 
         $response
             ->assertStatus(200)
-            ->assertJsonCount(10);
+            ->assertJsonCount(10)
+            ->assertJsonStructure([
+                '*' => [
+                    'id',
+                    'name',
+                    'nim_nip',
+                    'email'
+                ]
+            ]);
     }
 
     public function test_co_cannot_see_all_users(): void
@@ -116,7 +155,7 @@ class ProfileManagementTest extends TestCase
     {
         $passenger = $this->dummy_passenger();
 
-        $response = $this->actingAs($passenger)->get('api/passenger');
+        $response = $this->actingAs($passenger)->get('api/passengers');
 
         $response->assertStatus(403);
     }
@@ -131,7 +170,16 @@ class ProfileManagementTest extends TestCase
 
         $response
             ->assertStatus(200)
-            ->assertJsonStructure(['name']);
+            ->assertJsonStructure([
+                'id',
+                'nim_nip',
+                'name',
+                'email',
+                'address',
+                'phone_number',
+                'role_name',
+                'credit_score'
+            ]);
     }
 
     public function test_passenger_cannot_see_other_passenger_profile(): void
@@ -150,6 +198,43 @@ class ProfileManagementTest extends TestCase
 
     public function test_user_can_update_their_profile(): void
     {
-        
+
     }
+
+    public function test_other_user_cannot_update_other_user_profile(): void
+    {
+
+    }
+
+    public function test_user_can_delete_their_profile(): void
+    {
+
+    }
+
+    public function test_other_user_cannot_delete_other_user_profile(): void
+    {
+
+    }
+
+    // public function test_user_lost_5_credit_score_if_schedule_not_verified(): void
+    // {
+    //     $passenger = $this->dummy_passenger();
+
+    //     $bus = $this->dummy_bus();
+
+    //     $dt = Carbon::parse(now())->subHour(2);
+
+    //     $schedule_id = $this->dummy_schedule_id($bus->id, $dt);
+
+    //     $seat = Schedule::find($schedule_id)->seats[0];
+
+    //     $this->actingAs($passenger)->get('api/seats/' . $seat->id);
+
+    //     $passenger->refresh();
+
+    //     $this->assertDatabaseHas('users', [
+    //         'id' => $passenger->id,
+    //         'credit_score' => 10
+    //     ]);
+    // }
 }

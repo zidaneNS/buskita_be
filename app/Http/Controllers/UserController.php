@@ -22,7 +22,7 @@ class UserController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        $users = User::whereNot('role_id', 1)->get();
+        $users = User::all()->setVisible(['id', 'name', 'nim_nip', 'email']);
 
         return response($users);
     }
@@ -43,7 +43,16 @@ class UserController extends Controller implements HasMiddleware
     {
         Gate::authorize('view', $user);
 
-        return response($user);
+        return response([
+            'id' => $user->id,
+            'nim_nip' => $user->nim_nip,
+            'name' => $user->name,
+            'email' => $user->email,
+            'address' => $user->address,
+            'phone_number' => $user->phone_number,
+            'role_name' => $user->role->role_name,
+            'credit_score' => $user->credit_score
+        ]);
     }
 
     /**
@@ -64,14 +73,14 @@ class UserController extends Controller implements HasMiddleware
 
     public function passenger()
     {
-        $passengers = User::where('role_id', 3)->get();
+        $passengers = User::all()->where('role_id', 3)->setVisible(['id', 'name', 'nim_nip', 'email']);
     
         return response($passengers);
     }
 
     public function co()
     {
-        $co = User::where('role_id', 2)->get();
+        $co = User::all()->where('role_id', 2)->setVisible(['id', 'name', 'nim_nip', 'email']);
 
         return response($co);
     }

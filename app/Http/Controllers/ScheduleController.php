@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Middleware\AdminCoMiddleware;
 use App\Models\Bus;
+use App\Models\Route;
 use App\Models\Schedule;
 use App\Models\Seat;
 use Illuminate\Http\Request;
@@ -23,9 +24,21 @@ class ScheduleController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        $schedules = Schedule::all();
+        $schedules = Schedule::paginate(20);
 
-        return response($schedules);
+        $filteredSchedule = [];
+
+        foreach ($schedules as $schedule) {
+            $filteredSchedule[] = [
+                'id' => $schedule->id,
+                'time' => $schedule->time,
+                'bus_identity' => $schedule->bus->identity,
+                'route_name' => $schedule->route->route_name,
+                'closed' => $schedule->closed
+            ];
+        }
+
+        return response($filteredSchedule);
     }
 
     /**
@@ -34,12 +47,12 @@ class ScheduleController extends Controller implements HasMiddleware
     public function store(Request $request)
     {
         $validatedFields = $request->validate([
-            'bus_schedule' => 'required',
+            'time' => 'required',
             'bus_id' => 'required',
             'route_id' => 'required'
         ]);
 
-        $schedule = Schedule::create($validatedFields);
+        $schedule = Schedule::create($validatedFields)->fresh();
 
         $bus = Bus::find($validatedFields['bus_id']);
 
@@ -47,26 +60,22 @@ class ScheduleController extends Controller implements HasMiddleware
         $col = $bus->available_col;
         $backseat = $bus->available_backseat;
 
-        for ($i = 1; $i <= $row; $i++) {
-            for ($j = 1; $j <= $col; $j++) {
-                Seat::create([
-                    'bus_id' => $bus->id,
-                    'col_position' => $j,
-                    'row_position' => $i,
-                    'schedule_id' => $schedule->id
-                ]);
-            }
-        }
+        $total_seats = $row * $col + $backseat;
 
-        for ($k = 1; $k <= $backseat; $k++) {
+        for ($i = 1; $i <= $total_seats; $i++) {
             Seat::create([
                 'bus_id' => $bus->id,
-                'backseat_position' => $k,
                 'schedule_id' => $schedule->id
             ]);
         }
 
-        return response($schedule, 201);
+        return response([
+            'id' => $schedule->id,
+            'time' => $schedule->time,
+            'bus_identity' => $bus->identity,
+            'route_name' => $schedule->route->route_name,
+            'closed' => $schedule->closed
+        ], 201);
     }
 
     /**
@@ -74,7 +83,13 @@ class ScheduleController extends Controller implements HasMiddleware
      */
     public function show(Schedule $schedule)
     {
-        return response($schedule);
+        return response([
+            'id' => $schedule->id,
+            'time' => $schedule->time,
+            'bus_identity' => $schedule->bus->identity,
+            'route_name' => $schedule->route->route_name,
+            'closed' => $schedule->closed
+        ]);
     }
 
     /**
@@ -83,7 +98,7 @@ class ScheduleController extends Controller implements HasMiddleware
     public function update(Request $request, Schedule $schedule)
     {
         $validatedFields = $request->validate([
-            'bus_schedule' => 'required',
+            'time' => 'required',
             'bus_id' => 'required',
             'route_id' => 'required',
             'closed' => 'required'
@@ -91,7 +106,13 @@ class ScheduleController extends Controller implements HasMiddleware
 
         $schedule->update($validatedFields);
 
-        return response($schedule);
+        return response([
+            'id' => $schedule->id,
+            'time' => $schedule->time,
+            'bus_identity' => $schedule->bus->identity,
+            'route_name' => $schedule->route->route_name,
+            'closed' => $schedule->closed
+        ]);
     }
 
     /**

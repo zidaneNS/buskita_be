@@ -15,7 +15,7 @@ class Schedule extends Model
     use HasFactory;
 
     protected $fillable = [
-        'bus_schedule',
+        'time',
         'bus_id',
         'route_id',
         'closed'
@@ -26,9 +26,9 @@ class Schedule extends Model
         return $this->belongsToMany(User::class);
     }
 
-    public function bus(): HasOne
+    public function bus(): BelongsTo
     {
-        return $this->hasOne(Bus::class);
+        return $this->belongsTo(Bus::class);
     }
     
     public function route(): BelongsTo

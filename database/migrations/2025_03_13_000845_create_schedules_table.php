@@ -17,7 +17,7 @@ return new class extends Migration
     {
         Schema::create('schedules', function (Blueprint $table) {
             $table->id();
-            $table->dateTime('bus_schedule');
+            $table->dateTime('time');
             $table->foreignIdFor(Bus::class);
             $table->foreignIdFor(Route::class);
             $table->boolean('closed')->default(false);

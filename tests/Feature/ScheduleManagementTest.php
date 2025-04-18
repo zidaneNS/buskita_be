@@ -50,7 +50,7 @@ class ScheduleManagementTest extends TestCase
     public function dummy_schedule($bus_id): Schedule
     {
         return Schedule::create([
-            'bus_schedule' => now()->format('Y-m-d H:i:s'),
+            'time' => now()->format('Y-m-d H:i:s'),
             'bus_id' => $bus_id,
             'route_id' => 1
         ]);
@@ -63,12 +63,20 @@ class ScheduleManagementTest extends TestCase
         $bus = $this->dummy_bus();
 
         $response = $this->postJson('api/schedules', [
-            "bus_schedule" => now()->format('Y-m-d H:i:s'),
+            "time" => now()->format('Y-m-d H:i:s'),
             "bus_id" => $bus->id,
             "route_id" => 1
         ]);
 
-        $response->assertStatus(201);
+        $response
+        ->assertStatus(201)
+            ->assertJsonStructure([
+                'id',
+                'time',
+                'bus_identity',
+                'route_name',
+                'closed'
+            ]);
         $this->assertDatabaseHas('schedules', [
             "bus_id" => $bus->id
         ]);
@@ -83,16 +91,24 @@ class ScheduleManagementTest extends TestCase
         $schedule = $this->dummy_schedule($bus->id);
 
         $response = $this->putJson('api/schedules/' . $schedule->id, [
-            "bus_schedule" => "2026-04-21 08:00:00",
+            "time" => "2026-04-21 08:00:00",
             "bus_id" => $bus->id,
             "route_id" => $schedule->route_id,
             "closed" => false
         ]);
 
-        $response->assertStatus(200);
+        $response
+            ->assertStatus(200)
+            ->assertJsonStructure([
+                'id',
+                'time',
+                'bus_identity',
+                'route_name',
+                'closed'
+            ]);
         $this->assertDatabaseHas('schedules', [
             "id" => $schedule->id,
-            "bus_schedule" => "2026-04-21 08:00:00"
+            "time" => "2026-04-21 08:00:00"
         ]);
     }
 
@@ -124,7 +140,17 @@ class ScheduleManagementTest extends TestCase
 
         $response = $this->get('api/schedules');
 
-        $response->assertStatus(200);
+        $response
+            ->assertStatus(200)
+            ->assertJsonStructure([
+                '*' => [
+                    'id',
+                    'time',
+                    'bus_identity',
+                    'route_name',
+                    'closed'
+                ]
+            ]);
         $response->assertJsonCount(2);
     }
 
@@ -138,11 +164,19 @@ class ScheduleManagementTest extends TestCase
 
         $response = $this->get('api/schedules/' . $schedule->id);
 
-        $response->assertStatus(200);
-        $response->assertJson([
-            "id" => $schedule->id,
-            "bus_id" => $bus->id
-        ]);
+        $response
+            ->assertStatus(200)
+            ->assertJsonStructure([
+                'id',
+                'time',
+                'bus_identity',
+                'route_name',
+                'closed'
+            ])
+            ->assertJson([
+                "id" => $schedule->id,
+                "bus_identity" => $bus->identity
+            ]);
     }
 
     public function test_passenger_cant_access_create_update_delete(): void
@@ -154,7 +188,7 @@ class ScheduleManagementTest extends TestCase
         $schedule = $this->dummy_schedule($bus->id);
 
         $response1 = $this->postJson('api/schedules', [
-            "bus_schedule" => now()->format('Y-m-d H:i:s'),
+            "time" => now()->format('Y-m-d H:i:s'),
             "bus_id" => $bus->id,
             "route_id" => 1
         ]);
@@ -175,7 +209,7 @@ class ScheduleManagementTest extends TestCase
         $dt = Carbon::parse(now())->subHour();
 
         $schedule = Schedule::create([
-            'bus_schedule' => $dt,
+            'time' => $dt,
             'bus_id' => $bus->id,
             'route_id' => 1
         ]);

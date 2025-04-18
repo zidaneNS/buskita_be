@@ -20,8 +20,18 @@ class RefreshScheduleMiddleware
         $schedules = Schedule::all();
 
         foreach ($schedules as $schedule) {
-            $schedule_time = Carbon::parse($schedule->bus_schedule);
+            $schedule_time = Carbon::parse($schedule->time);
             $now = Carbon::parse(now());
+
+            foreach ($schedule->seats as $seat) {
+                if ($seat->user_id !== null && $seat->verified === false) {
+                    $user = $seat->user;
+
+                    $user->update([
+                        'credit_score' => $user->credit_score - 5
+                    ]);
+                }
+            }
 
             if ($now->diffInHours($schedule_time) < -1) {
                 $schedule->delete();

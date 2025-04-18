@@ -11,11 +11,11 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            "email" => "required|email",
+            "nim_nip" => "required",
             "password" => "required"
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('nim_nip', $request->nim_nip)->first();
 
         if (! $user || ! Hash::check($request->password, $user->password)) {
             return response(['error' => 'Invalid credentials'], 400);

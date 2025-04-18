@@ -7,7 +7,6 @@ use App\Models\Schedule;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
-use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class SeatManagementTest extends TestCase
@@ -47,7 +46,7 @@ class SeatManagementTest extends TestCase
         $co_leader = $this->dummy_co_leader();
 
         $response = $this->actingAs($co_leader)->postJson('api/schedules', [
-            "bus_schedule" => now()->format('Y-m-d H:i:s'),
+            "time" => now()->format('Y-m-d H:i:s'),
             "bus_id" => $bus_id,
             "route_id" => 1
         ]);
@@ -62,38 +61,18 @@ class SeatManagementTest extends TestCase
         $bus = $this->dummy_bus();
 
         $response = $this->actingAs($co_leader)->postJson('api/schedules', [
-            "bus_schedule" => now()->format('Y-m-d H:i:s'),
+            "time" => now()->format('Y-m-d H:i:s'),
             "bus_id" => $bus->id,
             "route_id" => 1
         ]);
 
         $response->assertStatus(201);
-        $this->assertDatabaseHas('seats', [
-            'bus_id' => $bus->id,
-            'row_position' => 1,
-            'col_position' => 1
-        ]);
-        $this->assertDatabaseHas('seats', [
-            'bus_id' => $bus->id,
-            'row_position' => $bus->available_row,
-            'col_position' => $bus->available_col,
-            'schedule_id' => $response['id']
-        ]);
-        $this->assertDatabaseHas('seats', [
-            'bus_id' => $bus->id,
-            'backseat_position' => $bus->available_backseat,
-            'schedule_id' => $response['id']
-        ]);
-        $this->assertDatabaseMissing('seats', [
-            'bus_id' => $bus->id,
-            'row_position' => $bus->available_row + 1,
-            'schedule_id' => $response['id']
-        ]);
-        $this->assertDatabaseMissing('seats', [
-            'bus_id' => $bus->id,
-            'backseat_position' => $bus->available_backseat + 1,
-            'schedule_id' => $response['id']
-        ]);
+        
+        $schedule = Schedule::find($response['id']);
+
+        $total_seats = $bus->available_col * $bus->available_row + $bus->available_backseat;
+
+        $this->assertEquals(count($schedule->seats), $total_seats);
     }
 
     public function test_user_can_pick_seat_if_empty_and_credit_score_greater_than_10_and_schedule_not_closed(): void
@@ -102,17 +81,21 @@ class SeatManagementTest extends TestCase
 
         $schedule_id = $this->dummy_schedule_id($bus->id);
 
+        $schedule = Schedule::find($schedule_id);
+
+        $seat = $schedule->seats[0];
+
         $passenger = $this->dummy_passenger();
 
         $response = $this->actingAs($passenger)->postJson('api/seats', [
-            'bus_id' => $bus->id,
-            'schedule_id' => $schedule_id,
-            'row_position' => $bus->available_row,
-            'col_position' => $bus->available_col,
-            'backseat_position' => 0
+            'seat_id' => $seat->id
         ]);
 
-        $response->assertStatus(200);
+        $response
+            ->assertStatus(200)
+            ->assertJson([
+                'user_id' => $passenger->id
+            ]);
         $this
             ->assertDatabaseHas('schedule_user', [
                 'schedule_id' => $schedule_id,
@@ -138,12 +121,12 @@ class SeatManagementTest extends TestCase
             'credit_score' => 9
         ]);
 
+        $schedule = Schedule::find($schedule_id);
+
+        $seat = $schedule->seats[2];
+
         $response = $this->actingAs($passenger)->postJson('api/seats', [
-            'bus_id' => $bus->id,
-            'schedule_id' => $schedule_id,
-            'row_position' => $bus->available_row,
-            'col_position' => $bus->available_col,
-            'backseat_position' => 0
+            'seat_id' => $seat->id
         ]);
 
         $response->assertStatus(400);
@@ -162,20 +145,15 @@ class SeatManagementTest extends TestCase
             'role_id' => 3
         ]);
 
+        $schedule = Schedule::find($schedule_id);
+        $seat = $schedule->seats[0];
+
         $this->actingAs($passenger2)->postJson('api/seats', [
-            'bus_id' => $bus->id,
-            'schedule_id' => $schedule_id,
-            'row_position' => $bus->available_row,
-            'col_position' => $bus->available_col,
-            'backseat_position' => 0
+            'seat_id' => $seat->id
         ]);
 
         $response = $this->actingAs($passenger)->postJson('api/seats', [
-            'bus_id' => $bus->id,
-            'schedule_id' => $schedule_id,
-            'row_position' => $bus->available_row,
-            'col_position' => $bus->available_col,
-            'backseat_position' => 0
+            'seat_id' => $seat->id
         ]);
 
         $response->assertStatus(400);
@@ -196,19 +174,17 @@ class SeatManagementTest extends TestCase
 
         $schedule = Schedule::find($schedule_id);
 
+        $seat = $schedule->seats[1];
+
         $this->actingAs($co_leader)->putJson('api/schedules/' . $schedule_id, [
-            "bus_schedule" => $schedule->bus_schedule,
+            "time" => $schedule->time,
             "bus_id" => $bus->id,
             "route_id" => $schedule->route_id,
             "closed" => true
         ]);
 
         $response = $this->actingAs($passenger)->postJson('api/seats', [
-            'bus_id' => $bus->id,
-            'schedule_id' => $schedule_id,
-            'row_position' => $bus->available_row,
-            'col_position' => $bus->available_col,
-            'backseat_position' => 0
+            'seat_id' => $seat->id
         ]);
 
         $response->assertStatus(400);
@@ -222,11 +198,18 @@ class SeatManagementTest extends TestCase
 
         $passenger = $this->dummy_passenger();
 
-        $response = $this->actingAs($passenger)->postJson('api/seats/schedule', [
-            'schedule_id' => $schedule_id
-        ]);
+        $response = $this->actingAs($passenger)->get('api/seats/schedule/' . $schedule_id);
 
-        $response->assertJsonCount($bus->available_row * $bus->available_col + $bus->available_backseat);
+        $response
+            ->assertStatus(200)
+            ->assertJsonCount($bus->available_row * $bus->available_col + $bus->available_backseat)
+            ->assertJsonStructure([
+                '*' => [
+                    'id',
+                    'user_id',
+                    'verified'
+                ]
+            ]);
     }
 
     public function test_user_only_can_pick_one_seat_in_one_schedule(): void
@@ -237,20 +220,15 @@ class SeatManagementTest extends TestCase
 
         $passenger = $this->dummy_passenger();
 
+        $seat1 = Schedule::find($schedule_id)->seats[1];
+        $seat2 = Schedule::find($schedule_id)->seats[2];
+
         $this->actingAs($passenger)->postJson('api/seats', [
-            'bus_id' => $bus->id,
-            'schedule_id' => $schedule_id,
-            'row_position' => $bus->available_row,
-            'col_position' => $bus->available_col,
-            'backseat_position' => 0
+            'seat_id' => $seat1->id
         ]);
 
         $response = $this->actingAs($passenger)->postJson('api/seats', [
-            'bus_id' => $bus->id,
-            'schedule_id' => $schedule_id,
-            'row_position' => $bus->available_row - 1,
-            'col_position' => $bus->available_col,
-            'backseat_position' => 0
+            'seat_id' => $seat2->id
         ]);
 
         $response->assertStatus(400);
@@ -269,15 +247,13 @@ class SeatManagementTest extends TestCase
 
         $passenger = $this->dummy_passenger();
 
+        $seat = Schedule::find($schedule_id)->seats[0];
+
         $passenger_seat = $this->actingAs($passenger)->postJson('api/seats', [
-            'bus_id' => $bus->id,
-            'schedule_id' => $schedule_id,
-            'row_position' => $bus->available_row,
-            'col_position' => $bus->available_col,
-            'backseat_position' => 0
+            'seat_id' => $seat->id
         ]);
 
-        $response = $this->actingAs($co_leader)->deleteJson('api/seats/' . $passenger_seat['id']);
+        $response = $this->actingAs($co_leader)->delete('api/seats/' . $seat->id);
 
         $response->assertStatus(204);
         $this
@@ -286,7 +262,7 @@ class SeatManagementTest extends TestCase
                 'user_id' => $passenger->id
             ])
             ->assertDatabaseHas('seats', [
-                'id' => $passenger_seat['id'],
+                'id' => $seat->id,
                 'user_id' => null
             ]);
     }
@@ -299,15 +275,13 @@ class SeatManagementTest extends TestCase
 
         $passenger = $this->dummy_passenger();
 
-        $passenger_seat = $this->actingAs($passenger)->postJson('api/seats', [
-            'bus_id' => $bus->id,
-            'schedule_id' => $schedule_id,
-            'row_position' => $bus->available_row,
-            'col_position' => $bus->available_col,
-            'backseat_position' => 0
+        $seat = Schedule::find($schedule_id)->seats[1];
+
+        $this->actingAs($passenger)->postJson('api/seats', [
+            'seat_id' => $seat->id
         ]);
 
-        $response = $this->actingAs($passenger)->deleteJson('api/seats/' . $passenger_seat['id']);
+        $response = $this->actingAs($passenger)->deleteJson('api/seats/' . $seat->id);
 
         $response->assertStatus(204);
 
@@ -317,7 +291,7 @@ class SeatManagementTest extends TestCase
                 'user_id' => $passenger->id
             ])
             ->assertDatabaseHas('seats', [
-                'id' => $passenger_seat['id'],
+                'id' => $seat->id,
                 'user_id' => null
             ]);
     }
@@ -335,15 +309,13 @@ class SeatManagementTest extends TestCase
             'role_id' => 3
         ]);
 
-        $passenger_seat = $this->actingAs($passenger)->postJson('api/seats', [
-            'bus_id' => $bus->id,
-            'schedule_id' => $schedule_id,
-            'row_position' => $bus->available_row,
-            'col_position' => $bus->available_col,
-            'backseat_position' => 0
+        $seat = Schedule::find($schedule_id)->seats[0];
+
+        $this->actingAs($passenger)->postJson('api/seats', [
+            'seat_id' => $seat->id
         ]);
 
-        $response = $this->actingAs($passenger2)->delete('api/seats/' . $passenger_seat['id']);
+        $response = $this->actingAs($passenger2)->delete('api/seats/' . $seat->id);
 
         $response->assertStatus(403);
     }
@@ -356,32 +328,33 @@ class SeatManagementTest extends TestCase
 
         $passenger = $this->dummy_passenger();
 
-        $passenger_seat = $this->actingAs($passenger)->postJson('api/seats', [
-            'bus_id' => $bus->id,
-            'schedule_id' => $schedule_id,
-            'row_position' => $bus->available_row,
-            'col_position' => $bus->available_col,
-            'backseat_position' => 0
+        $schedule = Schedule::find($schedule_id);
+
+        $seat = $schedule->seats[0];
+        $new_seat = $schedule->seats[1];
+
+        $this->actingAs($passenger)->postJson('api/seats', [
+            'seat_id' => $seat->id
         ]);
 
-        $response = $this->actingAs($passenger)->putJson('api/seats/' . $passenger_seat['id'], [
-            'schedule_id' => $schedule_id,
-            'row_position' => $bus->available_row - 3,
-            'col_position' => $bus->available_col,
-            'backseat_position' => 0
+        $response = $this->actingAs($passenger)->putJson('api/seats/' . $seat->id, [
+            'new_seat_id' => $new_seat->id
         ]);
 
-        $response->assertStatus(200);
+        $response
+            ->assertStatus(200)
+            ->assertJsonStructure([
+                'id',
+                'user_id',
+                'verified'
+            ]);
         $this
             ->assertDatabaseHas('seats', [
-                'id' => $passenger_seat['id'],
+                'id' => $seat->id,
                 'user_id' => null
             ])
             ->assertDatabaseHas('seats', [
-                'schedule_id' => $schedule_id,
-                'row_position' => $bus->available_row - 3,
-                'col_position' => $bus->available_col,
-                'backseat_position' => 0,
+                'id' => $new_seat->id,
                 'user_id' => $passenger->id
             ]);
     }
@@ -398,19 +371,23 @@ class SeatManagementTest extends TestCase
             'nim_nip' => '123'
         ]);
 
-        $passenger_seat = $this->actingAs($passenger)->postJson('api/seats', [
-            'bus_id' => $bus->id,
-            'schedule_id' => $schedule_id,
-            'row_position' => $bus->available_row,
-            'col_position' => $bus->available_col,
-            'backseat_position' => 0
+        $seat = Schedule::find($schedule_id)->seats[0];
+
+        $this->actingAs($passenger)->postJson('api/seats', [
+            'seat_id' => $seat->id
         ]);
 
-        $response = $this->actingAs($co_leader)->get('api/seats/' . $passenger_seat['id'] . '/verify');
+        $response = $this->actingAs($co_leader)->get('api/seats/' . $seat->id . '/verify');
 
-        $response->assertStatus(200);
+        $response
+            ->assertStatus(200)
+            ->assertJsonStructure([
+                'id',
+                'user_id',
+                'verified'
+            ]);
         $this->assertDatabaseHas('seats', [
-            'id' => $passenger_seat['id'],
+            'id' => $seat->id,
             'verified' => true
         ]);
     }
@@ -428,15 +405,13 @@ class SeatManagementTest extends TestCase
             'role_id' => 3
         ]);
 
-        $passenger_seat = $this->actingAs($passenger)->postJson('api/seats', [
-            'bus_id' => $bus->id,
-            'schedule_id' => $schedule_id,
-            'row_position' => $bus->available_row,
-            'col_position' => $bus->available_col,
-            'backseat_position' => 0
+        $seat = Schedule::find($schedule_id)->seats[0];
+
+        $this->actingAs($passenger)->postJson('api/seats', [
+            'seat_id' => $seat->id
         ]);
 
-        $response = $this->actingAs($passenger2)->get('api/seats/' . $passenger_seat['id'] . '/verify');
+        $response = $this->actingAs($passenger2)->get('api/seats/' . $seat->id . '/verify');
         $response->assertStatus(403);
     }
 }

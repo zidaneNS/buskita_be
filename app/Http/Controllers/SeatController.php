@@ -21,14 +21,8 @@ class SeatController extends Controller implements HasMiddleware
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request, Schedule $schedule)
     {
-        $validatedFields = $request->validate([
-            'schedule_id' => 'required'
-        ]);
-
-        $schedule = Schedule::find($validatedFields['schedule_id']);
-
         $seats = $schedule->seats;
 
         return response($seats);
@@ -40,40 +34,31 @@ class SeatController extends Controller implements HasMiddleware
     public function store(Request $request)
     {
         $validatedFields = $request->validate([
-            'bus_id' => 'required',
-            'row_position' => 'required',
-            'col_position' => 'required',
-            'backseat_position' => 'required',
-            'schedule_id' => 'required'
+            'seat_id' => 'required'
         ]);
 
+        $seat = Seat::find($validatedFields['seat_id']);
+
+        $has_another_seat = Seat::where('schedule_id', $seat->schedule_id)
+            ->where('user_id', $request->user()->id)
+            ->where('id', '!=', $seat->id)
+            ->exists();
         
         if ($request->user()->credit_score < 10 || 
-            Seat::where('bus_id', $validatedFields['bus_id'])
-            ->where('row_position', $validatedFields['row_position'])
-            ->where('col_position', $validatedFields['col_position'])
-            ->where('backseat_position', $validatedFields['backseat_position'])
-            ->where('schedule_id', $validatedFields['schedule_id'])
-            ->pluck('user_id')[0] !== null ||
-            Schedule::whereRelation('users', 'users.id', $request->user()->id)->exists() ||
-            Schedule::find($validatedFields['schedule_id'])->closed) {
-            return response(["message" => "seat already taken or credit score less than 10"], 400);
+            $seat === null ||
+            $seat->user_id !== null ||
+            $seat->schedule->closed === true ||
+            $has_another_seat) {
+            return response(["message" => "seat already taken, schedule closed, or credit score less than 10"], 400);
         }
         
-        $request->user()->schedules()->attach($validatedFields['schedule_id']);
-        
-        $seat = Seat::where('bus_id', $validatedFields['bus_id'])
-        ->where('row_position', $validatedFields['row_position'])
-        ->where('col_position', $validatedFields['col_position'])
-        ->where('backseat_position', $validatedFields['backseat_position'])
-        ->where('schedule_id', $validatedFields['schedule_id'])
-        ->get();
+        $request->user()->schedules()->attach($seat->schedule_id);
 
-        $seat->toQuery()->update([
+        $seat->update([
             'user_id' => $request->user()->id
         ]);
 
-        return response($seat[0]);
+        return response(['user_id' => $seat->user_id]);
     }
 
     /**
@@ -90,26 +75,24 @@ class SeatController extends Controller implements HasMiddleware
     public function update(Request $request, Seat $seat)
     {
         $validatedFields = $request->validate([
-            'schedule_id' => 'required',
-            'row_position' => 'required',
-            'col_position' => 'required',
-            'backseat_position' => 'required'
+            'new_seat_id' => 'required'
         ]);
 
         $seat->update([
             'user_id' => null
         ]);
 
-        $newSeat = Seat::where('schedule_id', $validatedFields['schedule_id'])
-            ->where('row_position', $validatedFields['row_position'])
-            ->where('col_position', $validatedFields['col_position'])
-            ->where('backseat_position', $validatedFields['backseat_position'])
-            ->get();
-        $newSeat->toQuery()->update([
+        $new_seat = Seat::find($validatedFields['new_seat_id']);
+        
+        $new_seat->update([
             'user_id' => $request->user()->id
         ]);
 
-        return response($newSeat[0]);
+        return response([
+            'id' => $new_seat->id,
+            'user_id' => $new_seat->user_id,
+            'verified' => $new_seat->verified
+        ]);
     }
 
     /**
@@ -119,7 +102,7 @@ class SeatController extends Controller implements HasMiddleware
     {
         Gate::authorize('delete', $seat);
 
-        $user = User::find($seat->user_id);
+        $user = $seat->user;
 
         $user->schedules()->detach($seat->schedule_id);
 
@@ -136,6 +119,10 @@ class SeatController extends Controller implements HasMiddleware
             'verified' => !$seat->verified
         ]);
 
-        return response($seat);
+        return response([
+            'id' => $seat->id,
+            'user_id' => $seat->user_id,
+            'verified' => $seat->verified
+        ]);
     }
 }

@@ -17,9 +17,6 @@ return new class extends Migration
         Schema::create('seats', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Bus::class);
-            $table->bigInteger('row_position')->default(0);
-            $table->bigInteger('col_position')->default(0);
-            $table->bigInteger('backseat_position')->default(0);
             $table->foreignIdFor(User::class)->nullable();
             $table->foreignIdFor(Schedule::class);
             $table->boolean('verified')->default(false);

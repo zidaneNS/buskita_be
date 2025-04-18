@@ -12,13 +12,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::apiResource('/schedules', ScheduleController::class);
 
-        Route::apiResource('/seats', SeatController::class);
-        Route::post('/seats/schedule', [SeatController::class, 'index']);
+        Route::apiResource('/seats', SeatController::class)->except(['index', 'show']);
+        Route::get('/seats/schedule/{schedule}', [SeatController::class, 'index']);
         Route::get('/seats/{seat}/verify', [SeatController::class, 'verify']);
 
         Route::apiResource('/users', UserController::class);
         Route::get('/co', [UserController::class, 'co']);
-        Route::get('/passenger', [UserController::class, 'passenger']);
+        Route::get('/passengers', [UserController::class, 'passenger']);
 
         Route::post('/register', [AuthController::class, 'register'])->withoutMiddleware('auth:sanctum');
         Route::post('/login', [AuthController::class, 'login'])->name('login')->withoutMiddleware('auth:sanctum');

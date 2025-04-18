@@ -55,7 +55,7 @@ class AuthTest extends TestCase
         $this->register();
 
         $response = $this->postJson('api/login', [
-            "email" => "zidane@gmail.com",
+            "nim_nip" => "181221055",
             "password" => "password"
         ]);
 
