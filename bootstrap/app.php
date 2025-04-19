@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AddCreditScore;
 use App\Http\Middleware\AdminCoMiddleware;
 use App\Http\Middleware\CoLeaderOnly;
 use App\Http\Middleware\RefreshScheduleMiddleware;
@@ -19,7 +20,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'co-co_leader' => AdminCoMiddleware::class,
             'co_leader' => CoLeaderOnly::class
         ])->append([
-            RefreshScheduleMiddleware::class
+            RefreshScheduleMiddleware::class,
+            AddCreditScore::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

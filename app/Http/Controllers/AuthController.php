@@ -38,7 +38,7 @@ class AuthController extends Controller
             "nim_nip" => "required"
         ]);
 
-        $user = User::create($credentials);
+        $user = User::create($credentials)->fresh();
 
         return response($user, 201);
     }

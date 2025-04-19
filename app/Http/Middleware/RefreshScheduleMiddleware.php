@@ -21,19 +21,20 @@ class RefreshScheduleMiddleware
 
         foreach ($schedules as $schedule) {
             $schedule_time = Carbon::parse($schedule->time);
-            $now = Carbon::parse(now());
-
-            foreach ($schedule->seats as $seat) {
-                if ($seat->user_id !== null && $seat->verified === false) {
-                    $user = $seat->user;
-
-                    $user->update([
-                        'credit_score' => $user->credit_score - 5
-                    ]);
-                }
-            }
+            $now = Carbon::now();
 
             if ($now->diffInHours($schedule_time) < -1) {
+
+                foreach ($schedule->seats as $seat) {
+                    if ($seat->user_id !== null && $seat->verified === false) {
+                        $user = $seat->user;
+    
+                        $user->update([
+                            'credit_score' => $user->credit_score - 5
+                        ]);
+                    }
+                }
+
                 $schedule->delete();
             }
         }

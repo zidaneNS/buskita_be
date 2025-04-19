@@ -71,6 +71,9 @@ GET | api/users | - | [{ id, name, nim_nip, email }] | 200 | get all users | 1
 GET | api/passengers | - | [{ id, name, nim_nip, email }] | 200 | get all passengers | 1
 GET | api/co | - | [{ id, name, nim_nip, email }] | 200 | get all cos | 1
 GET | api/users/:id | - | [{ id, name, nim_nip, email, phone_number, address, credit_score, role_name }] | 200 | get user by id | 1
+POST | api/users | { nim_nip, name, email, address, phone_number, password, password_confirmation } | { id, name, nim_nip, email, phone_number, address, credit_score, role_name } | 201 | co leader create co | 1
+PUT | api/users/:id | { nim_nip, name, email, address, phone_number, password, password_confirmation } | { id, name, nim_nip, email, phone_number, address, credit_score, role_name } | 200 | user can update their profile | 1
+DELETE | api/users/:id | - | - | 204 | user can delete their profile | 1
 
 ## Database Structure
 
