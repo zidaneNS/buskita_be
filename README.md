@@ -56,13 +56,14 @@ GET | api/buses | - | [{ id, identity, available_row, available_col, available_b
 GET | api/buses/:id | - | { id, identity, available_row, available_col, available_backseat } | 200 | get bus by id | 1
 POST | api/register | { name, nim_nip, address, phone_number, email, password, password_confirmation, role_id } | - | 201 | register | 0
 POST | api/login | { nim_nip, password } | { token } | 200 | login | 0
-GET | api/logout | - | - | 204 | logout | 0
+GET | api/logout | - | - | 204 | logout | 1
 POST | api/schedules | { time, bus_id, route_id } | { id, time, bus_identity, route_name, closed } | 201 | create bus | 1
 GET | api/schedules | - | [{ id, time, bus_identity, route_name, closed }] | 200 | get all schedules | 1
 GET | api/schedules/:id | - | { id, time, bus_identity, route_name, closed } | 200 | get schedule by id | 1
 PUT | api/schedules/:id | { time, bus_id, route_id, closed } | { id, time, bus_identity, route_name, closed } | 200 | update schedule by id | 1
 DELETE | api/schedules/:id | - | - | 204 | delete schedule by id | 1
-POST | api/seats | { seat_id } | { user_id } | 200 | user attach seat | 1
+GET | api/schedules/route/:id | - | [{ id, time, bus_identity, route_name, closed }] | 200 | get all schedules by route id | 1
+POS | api/seats | { seat_id } | { user_id } | 200 | user attach seat | 1
 GET | api/seats/schedule/:id | - | [{ id, user_id, verified }] | 200 | get all seat list | 1
 DELETE | api/seats/:id | - | - | 204 | user detach seat | 1
 PUT | api/seats/:id | { new_seat_id } | { id, user_id, verified } | 200 | user move their seat | 1
@@ -74,6 +75,7 @@ GET | api/users/:id | - | [{ id, name, nim_nip, email, phone_number, address, cr
 POST | api/users | { nim_nip, name, email, address, phone_number, password, password_confirmation } | { id, name, nim_nip, email, phone_number, address, credit_score, role_name } | 201 | co leader create co | 1
 PUT | api/users/:id | { nim_nip, name, email, address, phone_number, password, password_confirmation } | { id, name, nim_nip, email, phone_number, address, credit_score, role_name } | 200 | user can update their profile | 1
 DELETE | api/users/:id | - | - | 204 | user can delete their profile | 1
+GET | api/routes | - | [{ id, route_name }] | 200 | get all routes | 1
 
 ## Database Structure
 

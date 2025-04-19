@@ -16,7 +16,7 @@ class ScheduleController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('co-co_leader', except: ['index', 'show'])
+            new Middleware('co-co_leader', except: ['index', 'show', 'byRoute'])
         ];
     }
     /**
@@ -123,5 +123,23 @@ class ScheduleController extends Controller implements HasMiddleware
         $schedule->delete();
 
         return response(null, 204);
+    }
+
+    public function byRoute(Route $route) {
+        $schedules = Schedule::where('route_id', $route->id)->paginate(20);
+
+        $filteredSchedule = [];
+
+        foreach ($schedules as $schedule) {
+            $filteredSchedule[] = [
+                'id' => $schedule->id,
+                'time' => $schedule->time,
+                'bus_identity' => $schedule->bus->identity,
+                'route_name' => $schedule->route->route_name,
+                'closed' => $schedule->closed
+            ];
+        }
+
+        return response($filteredSchedule);
     }
 }

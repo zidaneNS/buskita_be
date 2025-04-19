@@ -47,12 +47,12 @@ class ScheduleManagementTest extends TestCase
         ]);
     }
 
-    public function dummy_schedule($bus_id): Schedule
+    public function dummy_schedule($bus_id, $route_id = 1): Schedule
     {
         return Schedule::create([
             'time' => now()->format('Y-m-d H:i:s'),
             'bus_id' => $bus_id,
-            'route_id' => 1
+            'route_id' => $route_id
         ]);
     }
 
@@ -219,5 +219,48 @@ class ScheduleManagementTest extends TestCase
         $this->assertDatabaseMissing('schedules', [
             'id' => $schedule->id
         ]);
+    }
+
+    public function test_can_get_all_schedules_by_route_id(): void
+    {
+        $passenger = $this->dummy_passenger();
+
+        $bus1 = $this->dummy_bus();
+        $bus2 = $this->dummy_bus('4');
+
+        $this->dummy_schedule($bus1->id, 2);
+        $this->dummy_schedule($bus2->id, 2);
+
+        $response = $this->actingAs($passenger)->get('api/schedules/route/2');
+
+        $response
+            ->assertStatus(200)
+            ->assertJsonStructure([
+                '*' => [
+                    'id',
+                    'time',
+                    'bus_identity',
+                    'route_name',
+                    'closed'
+                ]
+            ]);
+        $response->assertJsonCount(2);
+    }
+
+    public function test_can_get_all_routes(): void
+    {
+        $passenger = $this->dummy_passenger();
+
+        $response = $this->actingAs($passenger)->get('api/routes');
+
+        $response
+            ->assertStatus(200)
+            ->assertJsonStructure([
+                '*' => [
+                    'id',
+                    'route_name'
+                ]
+            ])
+            ->assertJsonCount(2);
     }
 }
