@@ -93,6 +93,10 @@ class SeatManagementTest extends TestCase
 
         $response
             ->assertStatus(200)
+            ->assertJsonStructure([
+                'user_id',
+                'seat_number'
+            ])
             ->assertJson([
                 'user_id' => $passenger->id
             ]);
@@ -207,7 +211,8 @@ class SeatManagementTest extends TestCase
                 '*' => [
                     'id',
                     'user_id',
-                    'verified'
+                    'verified',
+                    'seat_number'
                 ]
             ]);
     }
@@ -346,7 +351,8 @@ class SeatManagementTest extends TestCase
             ->assertJsonStructure([
                 'id',
                 'user_id',
-                'verified'
+                'verified',
+                'seat_number'
             ]);
         $this
             ->assertDatabaseHas('seats', [
@@ -384,7 +390,8 @@ class SeatManagementTest extends TestCase
             ->assertJsonStructure([
                 'id',
                 'user_id',
-                'verified'
+                'verified',
+                'seat_number'
             ]);
         $this->assertDatabaseHas('seats', [
             'id' => $seat->id,

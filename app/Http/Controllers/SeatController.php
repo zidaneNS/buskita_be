@@ -58,7 +58,10 @@ class SeatController extends Controller implements HasMiddleware
             'user_id' => $request->user()->id
         ]);
 
-        return response(['user_id' => $seat->user_id]);
+        return response([
+            'user_id' => $seat->user_id,
+            'seat_number' => $seat->seat_number
+        ]);
     }
 
     /**
@@ -91,7 +94,8 @@ class SeatController extends Controller implements HasMiddleware
         return response([
             'id' => $new_seat->id,
             'user_id' => $new_seat->user_id,
-            'verified' => $new_seat->verified
+            'verified' => $new_seat->verified,
+            'seat_number' => $seat->seat_number
         ]);
     }
 
@@ -122,7 +126,8 @@ class SeatController extends Controller implements HasMiddleware
         return response([
             'id' => $seat->id,
             'user_id' => $seat->user_id,
-            'verified' => $seat->verified
+            'verified' => $seat->verified,
+            'seat_number' => $seat->seat_number
         ]);
     }
 }

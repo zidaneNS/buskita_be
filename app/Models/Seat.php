@@ -15,7 +15,8 @@ class Seat extends Model
         'bus_id',
         'user_id',
         'schedule_id',
-        'verified'
+        'verified',
+        'seat_number'
     ];
 
     public function user(): BelongsTo

@@ -65,7 +65,8 @@ class ScheduleController extends Controller implements HasMiddleware
         for ($i = 1; $i <= $total_seats; $i++) {
             Seat::create([
                 'bus_id' => $bus->id,
-                'schedule_id' => $schedule->id
+                'schedule_id' => $schedule->id,
+                'seat_number' => $i
             ]);
         }
 

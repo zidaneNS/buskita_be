@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignIdFor(Bus::class);
             $table->foreignIdFor(User::class)->nullable();
             $table->foreignIdFor(Schedule::class);
+            $table->string('seat_number');
             $table->boolean('verified')->default(false);
             $table->timestamps();
         });
