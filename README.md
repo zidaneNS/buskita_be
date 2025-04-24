@@ -130,6 +130,7 @@ GET | api/routes | - | [{ id, route_name }] | 200 | get all routes | 1
  user_id | NULLABLE, FOREIGN KEY -> users
  schedule_id | NOT NULL, FOREIGN KEY -> schedules
  verified | NOT NULL, BOOLEAN, DEFAULT = false
+ seat_number | NOT NULL, VARCHAR
 
 ### schedule_user (pivot)
  attributes | description
