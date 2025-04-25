@@ -19,6 +19,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/seats/{seat}/verify', [SeatController::class, 'verify']);
 
         Route::apiResource('/users', UserController::class);
+        Route::get('/user', [UserController::class, 'getData']);
         Route::get('/co', [UserController::class, 'co']);
         Route::get('/passengers', [UserController::class, 'passenger']);
 

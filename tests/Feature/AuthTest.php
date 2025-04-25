@@ -19,8 +19,6 @@ class AuthTest extends TestCase
             "name" => "zidane",
             "nim_nip" => "181221055"
         ]);
-
-        Sanctum::actingAs($user);
         return $user;
     }
 
@@ -52,9 +50,9 @@ class AuthTest extends TestCase
 
     public function test_can_login(): void
     {
-        $this->register();
+        $co_leader = $this->dummy_co_leader();
 
-        $response = $this->postJson('api/login', [
+        $response = $this->actingAs($co_leader)->postJson('api/login', [
             "nim_nip" => "181221055",
             "password" => "password"
         ]);
@@ -63,11 +61,31 @@ class AuthTest extends TestCase
         $response->assertJsonStructure(['token']);
     }
 
+    public function test_assigned_user_can_get_their_information(): void
+    {
+        $co_leader = $this->dummy_co_leader();
+
+        $response = $this->actingAs($co_leader)->get('api/user');
+
+        $response
+            ->assertStatus(200)
+            ->assertJsonStructure([
+                'id',
+                'nim_nip',
+                'name',
+                'email',
+                'phone_number',
+                'address',
+                'credit_score',
+                'role_name'
+            ]);
+    }
+
     public function test_can_logout(): void
     {
-        $this->dummy_co_leader();
+        $co_leader = $this->dummy_co_leader();
 
-        $response = $this->get('api/logout');
+        $response = $this->actingAs($co_leader)->get('api/logout');
         $response->assertStatus(204);
     }
 }

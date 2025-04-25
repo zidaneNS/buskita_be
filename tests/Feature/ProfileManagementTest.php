@@ -255,9 +255,7 @@ class ProfileManagementTest extends TestCase
             'name' => 'new name',
             'email' => $passenger->email,
             'address' => fake()->address(),
-            'phone_number' => fake()->phoneNumber(),
-            'password' => 'password',
-            'password_confirmation' => 'password'
+            'phone_number' => fake()->phoneNumber()
         ]);
 
         $response

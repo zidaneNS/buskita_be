@@ -88,7 +88,6 @@ class UserController extends Controller implements HasMiddleware
             'nim_nip' => 'required',
             'name' => 'required',
             'email' => 'required|email',
-            'password' => 'required|confirmed',
             'address' => 'required',
             'phone_number' => 'required'
         ]);
@@ -133,5 +132,21 @@ class UserController extends Controller implements HasMiddleware
         $co = User::all()->where('role_id', 2)->setVisible(['id', 'name', 'nim_nip', 'email']);
 
         return response($co);
+    }
+
+    public function getData(Request $request)
+    {
+        $user = $request->user();
+
+        return response([
+            'id' => $user->id,
+            'nim_nip' => $user->nim_nip,
+            'name' => $user->name,
+            'email' => $user->email,
+            'address' => $user->address,
+            'phone_number' => $user->phone_number,
+            'role_name' => $user->role->role_name,
+            'credit_score' => $user->credit_score
+        ]);
     }
 }
