@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Bus;
+use App\Models\Route;
 use App\Models\Schedule;
 use App\Models\Seat;
 use Carbon\Carbon;
@@ -23,7 +24,7 @@ class ScheduleSeeder extends Seeder
             'identity' => '12'
         ]);
 
-        $dates = ['2025-03-13', '2025-03-14', '2025-03-15'];
+        $dates = ['2025-09-13', '2025-09-14', '2025-09-15'];
 
         foreach ($dates as $date) {
             $schedule = Schedule::factory()->create([

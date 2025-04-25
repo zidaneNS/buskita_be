@@ -24,7 +24,7 @@ class ScheduleController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        $schedules = Schedule::paginate(20);
+        $schedules = Schedule::with(['bus', 'route'])->get();
 
         $filteredSchedule = [];
 
