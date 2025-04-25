@@ -140,7 +140,7 @@ class BusManagementTest extends TestCase
         $response = $this->getJson('api/buses');
 
         $response->assertStatus(200);
-        $response->assertJsonCount(2);
+        $response->assertJsonCount(3);
     }
 
     public function test_admin_co_can_get_bus_by_id(): void

@@ -93,7 +93,7 @@ class ProfileManagementTest extends TestCase
 
         $response
             ->assertStatus(200)
-            ->assertJsonCount(11)
+            ->assertJsonCount(14)
             ->assertJsonStructure([
                 '*' => [
                     'id',
@@ -114,7 +114,7 @@ class ProfileManagementTest extends TestCase
 
         $response
             ->assertStatus(200)
-            ->assertJsonCount(10)
+            ->assertJsonCount(11)
             ->assertJsonStructure([
                 '*' => [
                     'id',

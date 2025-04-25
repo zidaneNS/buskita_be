@@ -19,6 +19,11 @@ class DatabaseSeeder extends Seeder
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
         // ]);
-        $this->call([RouteSeeder::class, RoleSeeder::class]);
+        $this->call([
+            RouteSeeder::class, 
+            RoleSeeder::class, 
+            UserSeeder::class,
+            ScheduleSeeder::class
+        ]);
     }
 }
