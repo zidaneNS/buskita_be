@@ -263,4 +263,30 @@ class ScheduleManagementTest extends TestCase
             ])
             ->assertJsonCount(2);
     }
+
+    public function test_can_get_bus_by_schedule_id(): void
+    {
+        $passenger = $this->dummy_passenger();
+
+        $bus = $this->dummy_bus();
+
+        $schedule = $this->dummy_schedule($bus->id, 2);
+
+        $response = $this->actingAs($passenger)->get('api/bus/schedule/' . $schedule->id);
+
+        $response
+            ->assertStatus(200)
+            ->assertJsonStructure([
+                'identity',
+                'available_row',
+                'available_col',
+                'available_backseat'
+            ])
+            ->assertJson([
+                'identity' => $bus->identity,
+                'available_row' => $bus->available_row,
+                'available_col' => $bus->available_col,
+                'available_backseat' => $bus->available_backseat,
+            ]);
+    }
 }

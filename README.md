@@ -65,6 +65,7 @@ DELETE | api/schedules/:id | - | - | 204 | delete schedule by id | 1
 GET | api/schedules/route/:id | - | [{ id, time, bus_identity, route_name, closed }] | 200 | get all schedules by route id | 1
 POST | api/seats | { seat_id } | { seat_number, user_id } | 200 | user attach seat | 1
 GET | api/seats/schedule/:id | - | [{ seat_number, id, user_id, verified }] | 200 | get all seat list | 1
+GET | api/bus/schedule/:id | - | { identity, available_row, available_col, available_backseat } | 200 | get bus by schedule id | 1
 DELETE | api/seats/:id | - | - | 204 | user detach seat | 1
 PUT | api/seats/:id | { new_seat_id } | { seat_number, id, user_id, verified } | 200 | user move their seat | 1
 GET | api/seats/:id/verify | - | { seat_number, id, user_id, verified } | 200 | co/co_leader verify user | 1
