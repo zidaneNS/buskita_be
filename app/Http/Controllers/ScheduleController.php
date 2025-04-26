@@ -16,7 +16,7 @@ class ScheduleController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('co-co_leader', except: ['index', 'show', 'byRoute', 'bus'])
+            new Middleware('co-co_leader', except: ['index', 'show', 'byRoute', 'bus', 'byUser'])
         ];
     }
     /**
@@ -153,5 +153,25 @@ class ScheduleController extends Controller implements HasMiddleware
             'available_col' => $bus->available_col,
             'available_backseat' => $bus->available_backseat
         ]);
+    }
+
+    public function byUser(Request $request) {
+        $user = $request->user();
+
+        $schedules = $user->schedules;
+
+        $filteredSchedules = [];
+
+        foreach ($schedules as $schedule) {
+            $filteredSchedules[] = [
+                'id' => $schedule->id,
+                'time' => $schedule->time,
+                'bus_identity' => $schedule->bus->identity,
+                'route_name' => $schedule->route->route_name,
+                'closed' => $schedule->closed
+            ];
+        }
+
+        return response($filteredSchedules);
     }
 }
