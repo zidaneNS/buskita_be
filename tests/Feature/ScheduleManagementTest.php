@@ -151,7 +151,7 @@ class ScheduleManagementTest extends TestCase
                     'closed'
                 ]
             ]);
-        $response->assertJsonCount(2);
+        $response->assertJsonCount(5);
     }
 
     public function test_user_can_get_schedule_by_id(): void

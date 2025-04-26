@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('routes', function (Blueprint $table) {
             $table->id();
-            $table->string('route_name');
+            $table->enum('route_name', ['GSK-SBY', 'SBY-GSK']);
             $table->timestamps();
         });
     }

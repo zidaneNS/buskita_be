@@ -14,11 +14,11 @@ class RouteSeeder extends Seeder
     public function run(): void
     {
         Route::create([
-            'route_name' => 'sby_gsk'
+            'route_name' => 'GSK-SBY'
         ]);
 
         Route::create([
-            'route_name' => 'gsk_sby'
+            'route_name' => 'SBY-GSK'
         ]);
     }
 }
