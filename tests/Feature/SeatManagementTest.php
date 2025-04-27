@@ -365,6 +365,35 @@ class SeatManagementTest extends TestCase
             ]);
     }
 
+    public function test_user_cannot_change_their_seat_to_occupied_seat(): void
+    {
+        $bus = $this->dummy_bus();
+
+        $schedule_id = $this->dummy_schedule_id($bus->id);
+
+        $passenger1 = $this->dummy_passenger();
+        $passenger2 = User::factory()->create([
+            'name' => 'test',
+            'nim_nip' => '123',
+            'role_id' => 3
+        ]);
+
+        $schedule = Schedule::find($schedule_id);
+
+        $seat = $schedule->seats[0];
+        $new_seat = $schedule->seats[1];
+
+        $this->actingAs($passenger1)->postJson('api/seats', [
+            'seat_id' => $seat->id
+        ]);
+
+        $response = $this->actingAs($passenger2)->putJson('api/seats/' . $seat->id, [
+            'new_seat_id' => $new_seat->id
+        ]);
+
+        $response->assertStatus(400);
+    }
+
     public function test_co_co_leader_can_verify_user(): void
     {
         $bus = $this->dummy_bus();

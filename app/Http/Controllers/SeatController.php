@@ -81,6 +81,12 @@ class SeatController extends Controller implements HasMiddleware
             'new_seat_id' => 'required'
         ]);
 
+        $user = $request->user();
+
+        if ($seat->user_id !== null && $seat->user_id !== $user->id) {
+            return response(['message' => 'already occupied'], 400);
+        }
+
         $seat->update([
             'user_id' => null
         ]);
