@@ -82,8 +82,9 @@ class SeatController extends Controller implements HasMiddleware
         ]);
 
         $user = $request->user();
+        $new_seat = Seat::find($validatedFields['new_seat_id']);
 
-        if ($seat->user_id !== null && $seat->user_id !== $user->id) {
+        if ($seat->user_id !== null && $seat->user_id !== $user->id && $new_seat->id === $seat->id) {
             return response(['message' => 'already occupied'], 400);
         }
 
@@ -91,7 +92,6 @@ class SeatController extends Controller implements HasMiddleware
             'user_id' => null
         ]);
 
-        $new_seat = Seat::find($validatedFields['new_seat_id']);
         
         $new_seat->update([
             'user_id' => $request->user()->id

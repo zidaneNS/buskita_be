@@ -381,17 +381,25 @@ class SeatManagementTest extends TestCase
         $schedule = Schedule::find($schedule_id);
 
         $seat = $schedule->seats[0];
-        $new_seat = $schedule->seats[1];
+        $seat2 = $schedule->seats[1];
+        $seat3 = $schedule->seats[2];
 
         $this->actingAs($passenger1)->postJson('api/seats', [
             'seat_id' => $seat->id
         ]);
+        $this->actingAs($passenger2)->postJson('api/seats', [
+            'seat_id' => $seat2->id
+        ]);
 
         $response = $this->actingAs($passenger2)->putJson('api/seats/' . $seat->id, [
-            'new_seat_id' => $new_seat->id
+            'new_seat_id' => $seat->id
         ]);
 
         $response->assertStatus(400);
+        $this->assertDatabaseHas('seats', [
+            'id' => $seat->id,
+            'user_id' => $passenger1->id
+        ]);
     }
 
     public function test_co_co_leader_can_verify_user(): void
