@@ -382,7 +382,6 @@ class SeatManagementTest extends TestCase
 
         $seat = $schedule->seats[0];
         $seat2 = $schedule->seats[1];
-        $seat3 = $schedule->seats[2];
 
         $this->actingAs($passenger1)->postJson('api/seats', [
             'seat_id' => $seat->id
@@ -391,7 +390,7 @@ class SeatManagementTest extends TestCase
             'seat_id' => $seat2->id
         ]);
 
-        $response = $this->actingAs($passenger2)->putJson('api/seats/' . $seat->id, [
+        $response = $this->actingAs($passenger2)->putJson('api/seats/' . $seat2->id, [
             'new_seat_id' => $seat->id
         ]);
 
