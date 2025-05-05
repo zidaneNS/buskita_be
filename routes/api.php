@@ -16,7 +16,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('user/schedules', [ScheduleController::class, 'byUser']);
         Route::get('/bus/schedule/{schedule}', [ScheduleController::class, 'bus']);
 
-        Route::apiResource('/seats', SeatController::class)->except(['index', 'show']);
+        Route::apiResource('/seats', SeatController::class)->except(['index']);
         Route::get('/seats/schedule/{schedule}', [SeatController::class, 'index']);
         Route::get('/seats/{seat}/verify', [SeatController::class, 'verify']);
 

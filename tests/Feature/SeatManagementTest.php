@@ -488,4 +488,32 @@ class SeatManagementTest extends TestCase
             ])
             ->assertJsonCount(1);
     }
+
+    public function test_can_get_seat_by_id(): void
+    {
+        $bus = $this->dummy_bus();
+    
+        $schedule_id = $this->dummy_schedule_id($bus->id);
+    
+        $passenger = $this->dummy_passenger();
+    
+        $seat = Schedule::find($schedule_id)->seats[1];
+    
+        $response = $this->actingAs($passenger)->get('api/seats/' . $seat->id);
+    
+        $response
+            ->assertStatus(200)
+            ->assertJsonStructure([
+                'id',
+                'seat_number',
+                'user_id',
+                'verified'
+            ])
+            ->assertJson([
+                'id' => $seat->id,
+                'seat_number' => $seat->seat_number,
+                'user_id' => $seat->user_id,
+                'verified' => $seat->verified
+            ]);
+    }
 }

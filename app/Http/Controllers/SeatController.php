@@ -69,7 +69,12 @@ class SeatController extends Controller implements HasMiddleware
      */
     public function show(Seat $seat)
     {
-        //
+        return response([
+            'id' => $seat->id,
+            'user_id' => $seat->user_id,
+            'verified' => $seat->verified,
+            'seat_number' => $seat->seat_number
+        ]);
     }
 
     /**
