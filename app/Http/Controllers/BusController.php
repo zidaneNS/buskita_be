@@ -40,7 +40,7 @@ class BusController extends Controller implements HasMiddleware
         ]);
 
         if (Bus::where('identity', $validatedFields['identity'])->exists()) {
-            return response("Bus identity must be unique", 400);
+            return response(["error" => "Bus identity must be unique"], 400);
         }
 
         $bus = Bus::create($validatedFields)->fresh();
