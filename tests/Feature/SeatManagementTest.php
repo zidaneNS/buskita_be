@@ -94,10 +94,12 @@ class SeatManagementTest extends TestCase
         $response
             ->assertStatus(200)
             ->assertJsonStructure([
-                'user_id',
-                'seat_number'
+                'user_name',
+                'seat_number',
+                'user_id'
             ])
             ->assertJson([
+                'user_name' => $passenger->name,
                 'user_id' => $passenger->id
             ]);
         $this
@@ -210,9 +212,10 @@ class SeatManagementTest extends TestCase
             ->assertJsonStructure([
                 '*' => [
                     'id',
-                    'user_id',
+                    'user_name',
                     'verified',
-                    'seat_number'
+                    'seat_number',
+                    'user_id'
                 ]
             ]);
     }
@@ -254,7 +257,7 @@ class SeatManagementTest extends TestCase
 
         $seat = Schedule::find($schedule_id)->seats[0];
 
-        $passenger_seat = $this->actingAs($passenger)->postJson('api/seats', [
+        $this->actingAs($passenger)->postJson('api/seats', [
             'seat_id' => $seat->id
         ]);
 
@@ -350,9 +353,10 @@ class SeatManagementTest extends TestCase
             ->assertStatus(200)
             ->assertJsonStructure([
                 'id',
-                'user_id',
+                'user_name',
                 'verified',
-                'seat_number'
+                'seat_number',
+                'user_id'
             ]);
         $this
             ->assertDatabaseHas('seats', [
@@ -425,9 +429,10 @@ class SeatManagementTest extends TestCase
             ->assertStatus(200)
             ->assertJsonStructure([
                 'id',
-                'user_id',
+                'user_name',
                 'verified',
-                'seat_number'
+                'seat_number',
+                'user_id'
             ]);
         $this->assertDatabaseHas('seats', [
             'id' => $seat->id,
@@ -506,14 +511,9 @@ class SeatManagementTest extends TestCase
             ->assertJsonStructure([
                 'id',
                 'seat_number',
-                'user_id',
-                'verified'
-            ])
-            ->assertJson([
-                'id' => $seat->id,
-                'seat_number' => $seat->seat_number,
-                'user_id' => $seat->user_id,
-                'verified' => $seat->verified
+                'user_name',
+                'verified',
+                'user_id'
             ]);
     }
 }

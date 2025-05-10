@@ -63,14 +63,14 @@ GET | api/schedules/:id | - | { id, time, bus_identity, route_name, closed } | 2
 PUT | api/schedules/:id | { time, bus_id, route_id, closed } | { id, time, bus_identity, route_name, closed } | 200 | update schedule by id | 1
 DELETE | api/schedules/:id | - | - | 204 | delete schedule by id | 1
 GET | api/schedules/route/:id | - | [{ id, time, bus_identity, route_name, closed }] | 200 | get all schedules by route id | 1
-POST | api/seats | { seat_id } | { seat_number, user_id } | 200 | user attach seat | 1
-GET | api/seats/schedule/:id | - | [{ seat_number, id, user_id, verified }] | 200 | get all seat list | 1
-GET | api/seats/:id | - | {seat_number, id, user_id, verified } | 200 | get seat by id | 1
+POST | api/seats | { seat_id } | { seat_number, user_id, user_name } | 200 | user attach seat | 1
+GET | api/seats/schedule/:id | - | [{ seat_number, id, user_name, user_id, verified }] | 200 | get all seat list | 1
+GET | api/seats/:id | - | {seat_number, id, user_name, user_id, verified } | 200 | get seat by id | 1
 GET | api/bus/schedule/:id | - | { identity, available_row, available_col, available_backseat } | 200 | get bus by schedule id | 1
 GET | api/user/schedules | - | { id, time, bus_identity, route_name, closed } | 200 | get schedule by user
 DELETE | api/seats/:id | - | - | 204 | user detach seat | 1
-PUT | api/seats/:id | { new_seat_id } | { seat_number, id, user_id, verified } | 200 | user move their seat | 1
-GET | api/seats/:id/verify | - | { seat_number, id, user_id, verified } | 200 | co/co_leader verify user | 1
+PUT | api/seats/:id | { new_seat_id } | { seat_number, id, user_name, user_id, verified } | 200 | user move their seat | 1
+GET | api/seats/:id/verify | - | { seat_number, id, user_name, user_id, verified } | 200 | co/co_leader verify user | 1
 GET | api/user | - | {id, nim_nip, name, email, phone_number, address, credit_score, role_name } | 200 | assigned user get their identity | 1
 GET | api/users | - | [{ id, name, nim_nip, email }] | 200 | get all users | 1
 GET | api/passengers | - | [{ id, name, nim_nip, email }] | 200 | get all passengers | 1

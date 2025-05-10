@@ -25,7 +25,23 @@ class SeatController extends Controller implements HasMiddleware
     {
         $seats = $schedule->seats;
 
-        return response($seats);
+        $filteredSeats = [];
+
+        foreach ($seats as $seat) {
+            $user_name = null;
+            if ($seat->user_id !== null) {
+                $user_name = $seat->user->name;
+            }
+            $filteredSeats[] = [
+                'id' => $seat->id,
+                'user_name' => $user_name,
+                'verified' => $seat->verified,
+                'seat_number' => $seat->seat_number,
+                'user_id' => $seat->user_id
+            ];
+        }
+
+        return response($filteredSeats);
     }
 
     /**
@@ -49,7 +65,7 @@ class SeatController extends Controller implements HasMiddleware
             $seat->user_id !== null ||
             $seat->schedule->closed === true ||
             $has_another_seat) {
-            return response(["message" => "seat already taken, schedule closed, or credit score less than 10"], 400);
+            return response(["error" => "seat already taken, schedule closed, or credit score less than 10"], 400);
         }
         
         $request->user()->schedules()->attach($seat->schedule_id);
@@ -59,8 +75,9 @@ class SeatController extends Controller implements HasMiddleware
         ]);
 
         return response([
-            'user_id' => $seat->user_id,
-            'seat_number' => $seat->seat_number
+            'user_name' => $seat->user->name,
+            'seat_number' => $seat->seat_number,
+            'user_id' => $seat->user_id
         ]);
     }
 
@@ -69,11 +86,16 @@ class SeatController extends Controller implements HasMiddleware
      */
     public function show(Seat $seat)
     {
+        $user_name = null;
+        if ($seat->user_id !== null) {
+            $user_name = $seat->user->name;
+        }
         return response([
             'id' => $seat->id,
-            'user_id' => $seat->user_id,
+            'user_name' => $user_name,
             'verified' => $seat->verified,
-            'seat_number' => $seat->seat_number
+            'seat_number' => $seat->seat_number,
+            'user_id' => $seat->user_id
         ]);
     }
 
@@ -104,9 +126,10 @@ class SeatController extends Controller implements HasMiddleware
 
         return response([
             'id' => $new_seat->id,
-            'user_id' => $new_seat->user_id,
+            'user_name' => $new_seat->user->name,
             'verified' => $new_seat->verified,
-            'seat_number' => $seat->seat_number
+            'seat_number' => $seat->seat_number,
+            'user_id' => $seat->user_id
         ]);
     }
 
@@ -136,9 +159,10 @@ class SeatController extends Controller implements HasMiddleware
 
         return response([
             'id' => $seat->id,
-            'user_id' => $seat->user_id,
+            'user_name' => $seat->user->name,
             'verified' => $seat->verified,
-            'seat_number' => $seat->seat_number
+            'seat_number' => $seat->seat_number,
+            'user_id' => $seat->user_id
         ]);
     }
 }
