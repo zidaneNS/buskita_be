@@ -72,12 +72,12 @@ DELETE | api/seats/:id | - | - | 204 | user detach seat | 1
 PUT | api/seats/:id | { new_seat_id } | { seat_number, id, user_name, user_id, verified } | 200 | user move their seat | 1
 GET | api/seats/:id/verify | - | { seat_number, id, user_name, user_id, verified } | 200 | co/co_leader verify user | 1
 GET | api/user | - | {id, nim_nip, name, email, phone_number, address, credit_score, role_name } | 200 | assigned user get their identity | 1
-GET | api/users | - | [{ id, name, nim_nip, email }] | 200 | get all users | 1
-GET | api/passengers | - | [{ id, name, nim_nip, email }] | 200 | get all passengers | 1
-GET | api/co | - | [{ id, name, nim_nip, email }] | 200 | get all cos | 1
+GET | api/users | - | [{ id, name, nim_nip, email, role_name, address, credit_score, phone_number }] | 200 | get all users | 1
+GET | api/passengers | - | [{ id, name, nim_nip, email, role_name, address, credit_score, phone_number }] | 200 | get all passengers | 1
+GET | api/co | - | [{ id, name, nim_nip, email, role_name, address, credit_score, phone_number }] | 200 | get all cos | 1
 GET | api/users/:id | - | [{ id, name, nim_nip, email, phone_number, address, credit_score, role_name }] | 200 | get user by id | 1
 POST | api/users | { nim_nip, name, email, address, phone_number, password, password_confirmation } | { id, name, nim_nip, email, phone_number, address, credit_score, role_name } | 201 | co leader create co | 1
-PUT | api/users/:id | { nim_nip, name, email, address, phone_number, password, password_confirmation } | { id, name, nim_nip, email, phone_number, address, credit_score, role_name } | 200 | user can update their profile | 1
+PUT | api/users/:id | { nim_nip, name, email, address, phone_number } | { id, name, nim_nip, email, phone_number, address, credit_score, role_name } | 200 | user can update their profile | 1
 DELETE | api/users/:id | - | - | 204 | user can delete their profile | 1
 GET | api/routes | - | [{ id, route_name }] | 200 | get all routes | 1
 

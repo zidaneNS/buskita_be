@@ -22,9 +22,24 @@ class UserController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        $users = User::all()->setVisible(['id', 'name', 'nim_nip', 'email']);
+        $users = User::all()->setVisible(['id', 'name', 'nim_nip', 'email', 'role_id']);
 
-        return response($users);
+        $filteredUsers = [];
+
+        foreach ($users as $user) {
+            $filteredUsers[] = [
+                'id' => $user->id,
+                'name' => $user->name,
+                'nim_nip' => $user->nim_nip,
+                'email' => $user->email,
+                'role_name' => $user->role->role_name,
+                'phone_number' => $user->phone_number,
+                'address' => $user->address,
+                'credit_score' => $user->credit_score
+            ];
+        }
+
+        return response($filteredUsers);
     }
 
     
@@ -122,16 +137,46 @@ class UserController extends Controller implements HasMiddleware
 
     public function passenger()
     {
-        $passengers = User::all()->where('role_id', 3)->setVisible(['id', 'name', 'nim_nip', 'email']);
+        $passengers = User::all()->where('role_id', 3);
     
-        return response($passengers);
+        $filteredPassengers = [];
+
+        foreach ($passengers as $passenger) {
+            $filteredPassengers[] = [
+                'id' => $passenger->id,
+                'name' => $passenger->name,
+                'nim_nip' => $passenger->nim_nip,
+                'email' => $passenger->email,
+                'role_name' => $passenger->role->role_name,
+                'address' => $passenger->address,
+                'phone_number' => $passenger->phone_number,
+                'credit_score' => $passenger->credit_score
+            ];
+        }
+
+        return response($filteredPassengers);
     }
 
     public function co()
     {
-        $co = User::all()->where('role_id', 2)->setVisible(['id', 'name', 'nim_nip', 'email']);
+        $cos = User::all()->where('role_id', 2);
 
-        return response($co);
+        $filteredCos = [];
+
+        foreach ($cos as $co) {
+            $filteredCos[] = [
+                'id' => $co->id,
+                'name' => $co->name,
+                'nim_nip' => $co->nim_nip,
+                'email' => $co->email,
+                'role_name' => $co->role->role_name,
+                'phone_number' => $co->phone_number,
+                'address' => $co->address,
+                'credit_score' => $co->credit_score
+            ];
+        }
+
+        return response($filteredCos);
     }
 
     public function getData(Request $request)

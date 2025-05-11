@@ -99,7 +99,11 @@ class ProfileManagementTest extends TestCase
                     'id',
                     'name',
                     'nim_nip',
-                    'email'
+                    'email',
+                    'role_name',
+                    'phone_number',
+                    'address',
+                    'credit_score'
                 ]
             ]);
     }
@@ -120,7 +124,11 @@ class ProfileManagementTest extends TestCase
                     'id',
                     'name',
                     'nim_nip',
-                    'email'
+                    'email',
+                    'role_name',
+                    'phone_number',
+                    'address',
+                    'credit_score'
                 ]
             ]);
     }
