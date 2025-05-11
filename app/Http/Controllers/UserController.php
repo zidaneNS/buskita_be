@@ -13,8 +13,8 @@ class UserController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('co_leader', only: ['index', 'store']),
-            new Middleware('co-co_leader', only: ['co', 'passenger'])
+            new Middleware('co_leader', only: ['store']),
+            new Middleware('co-co_leader', only: ['co', 'passenger', 'index'])
         ];
     }
     /**
